@@ -1,0 +1,22 @@
+logging:
+  level:
+    org.springframework: error
+    com.vts: warn
+    liquibase: info
+
+spring:
+  main:
+    allow-bean-definition-overriding: true
+  jpa:
+    hibernate:
+      ddl-auto: none
+  datasource:
+    type: com.zaxxer.hikari.HikariDataSource
+    url: jdbc:postgresql://smartgeosystem.ru:5432/vts_db1
+    username: vts_admin
+    password: GisPwd!2019
+    hikari:
+      poolName: Hikari
+      auto-commit: false
+  liquibase:
+   change-log: classpath:/db/liquibase/master.xml
