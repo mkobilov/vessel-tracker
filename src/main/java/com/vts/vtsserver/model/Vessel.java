@@ -20,22 +20,16 @@ public class Vessel {
     @Column(name = "id")
     private Long id;
 
-    @Column(name = "name")
     private String name;
 
-    @Column(name = "description")
     private String description;
 
-    @Column(name = "heading")
     private Double heading;
 
-    @Column(name = "speed")
     private Double speed;
 
-    @Column(name = "lat")
     private Double lat;
 
-    @Column(name = "lon")
     private Double lon;
 
     @Column(name = "creation_time")
@@ -44,7 +38,7 @@ public class Vessel {
     @Column(name = "update_time")
     private Timestamp updateTime;
 
-    @Column(name = "deleted", columnDefinition = "boolean default false")
+    @Column(columnDefinition = "boolean default false")
     private Boolean deleted = false;
 
 }

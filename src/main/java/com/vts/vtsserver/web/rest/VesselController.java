@@ -3,10 +3,8 @@ package com.vts.vtsserver.web.rest;
 import com.vts.vtsserver.model.Vessel;
 import com.vts.vtsserver.service.VesselService;
 import com.vts.vtsserver.web.rest.dto.VesselDTO;
-import com.vts.vtsserver.web.rest.dto.XY;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -50,13 +48,5 @@ public class VesselController {
         return vesselService.updateVessel(dto, name);
     }
 
-    @PostMapping("/test")
-    public ResponseEntity<String> postVesselTest(@RequestBody XY dto){
-        try {
-            Long z = dto.getX() + dto.getY();
-            return ResponseEntity.ok(z.toString());
-        } catch (Exception e){
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
-        }
-    }
+
 }

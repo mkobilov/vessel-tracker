@@ -3,7 +3,6 @@ package com.vts.vtsserver.service;
 import com.vts.vtsserver.model.Vessel;
 import com.vts.vtsserver.repository.VesselRepository;
 import com.vts.vtsserver.web.rest.dto.VesselDTO;
-import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -12,12 +11,10 @@ import org.springframework.stereotype.Service;
 
 import java.sql.Timestamp;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @Slf4j
 @RequiredArgsConstructor
-@Data
 public class VesselService {
     private final VesselRepository vesselRepository;
 
@@ -36,7 +33,7 @@ public class VesselService {
 
             return new ResponseEntity<>(list, HttpStatus.OK);
         } catch (Exception e) {
-            log.error("Service Error getVessel with speed:", speed);
+            log.error("Service Error getVessel with speed:" + speed, e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
     }
@@ -46,7 +43,7 @@ public class VesselService {
 
             return new ResponseEntity<>(list, HttpStatus.OK);
         } catch (Exception e) {
-            log.error("Service Error getVessel :");
+            log.error("Service Error getVessel :", e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
     }
@@ -56,7 +53,7 @@ public class VesselService {
 
             return ResponseEntity.ok(vessel);
         } catch (Exception e) {
-            log.error("Service Error getVessel with id:", id);
+            log.error("Service Error getVessel with id", id);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
     }
@@ -72,7 +69,7 @@ public class VesselService {
 
             return ResponseEntity.ok(vessel);
         }catch (Exception e){
-            log.error("Error posting new vessel", e);
+            log.error("Error posting new vessel" + dto, e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
     }
@@ -85,7 +82,7 @@ public class VesselService {
 
             return ResponseEntity.ok(vessel);
         } catch (Exception e) {
-            log.warn("Service Error while updating vessel with id:", id);
+            log.warn("Service Error while updating vessel with id:" + id, e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
     }
@@ -97,7 +94,7 @@ public class VesselService {
 
             return ResponseEntity.ok(vessel);
         } catch (Exception e) {
-            log.warn("Service Error while updating vessel with name:", name);
+            log.warn("Service Error while updating vessel with name:" + dto, e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
     }
