@@ -10,7 +10,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import javax.websocket.server.PathParam;
 import java.util.List;
 
 @Slf4j
@@ -21,6 +20,7 @@ public class VesselController {
     private final VesselService vesselService;
     @PostMapping
     public ResponseEntity<Vessel> postVessel(@RequestBody VesselDTO dto){
+
         return vesselService.postVessel(dto);
     }
 
@@ -35,6 +35,7 @@ public class VesselController {
     }
     @GetMapping("/{id}")
     public ResponseEntity<Vessel> getVessel(@PathVariable("id") Long id){
+
         return vesselService.getVessel(id);
     }
 
