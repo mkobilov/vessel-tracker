@@ -53,7 +53,7 @@ public class VesselService {
 
             return ResponseEntity.ok(vessel);
         } catch (Exception e) {
-            log.error("Service Error getVessel with id", id);
+            log.error("Service Error getVessel with id" + id, e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
     }
@@ -88,7 +88,7 @@ public class VesselService {
     }
     public ResponseEntity<Vessel> updateVessel(VesselDTO dto, String name) {
         try{
-            Vessel vessel = vesselRepository.findByName(name).get(0);
+            Vessel vessel = vesselRepository.findByName(name).stream().findAny().orElseThrow(() ->new Exception());
             changeVessel(vessel, dto);
             vessel = vesselRepository.save(vessel);
 
