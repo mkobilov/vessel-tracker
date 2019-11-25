@@ -1,4 +1,4 @@
-package com.vts.vtsserver.web.rest.dto;
+package com.vt.vtserver.web.rest.dto;
 
 
 import lombok.Data;

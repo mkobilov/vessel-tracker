@@ -1,6 +1,6 @@
-package com.vts.vtsserver.repository;
+package com.vt.vtserver.repository;
 
-import com.vts.vtsserver.model.Vessel;
+import com.vt.vtserver.model.Vessel;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;

@@ -1,13 +1,13 @@
-package com.vts.vtsserver;
+package com.vt.vtserver;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class VtsServerApplication {
+public class VtServerApplication {
 
     public static void main(String[] args) {
-        SpringApplication.run(VtsServerApplication.class, args);
+        SpringApplication.run(VtServerApplication.class, args);
     }
 
 }

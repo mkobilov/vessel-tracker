@@ -1,6 +1,5 @@
-package com.vts.vtsserver.web.rest;
+package com.vt.vtserver.web.rest;
 
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;

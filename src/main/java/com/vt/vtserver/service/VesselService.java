@@ -1,8 +1,8 @@
-package com.vts.vtsserver.service;
+package com.vt.vtserver.service;
 
-import com.vts.vtsserver.model.Vessel;
-import com.vts.vtsserver.repository.VesselRepository;
-import com.vts.vtsserver.web.rest.dto.VesselDTO;
+import com.vt.vtserver.model.Vessel;
+import com.vt.vtserver.repository.VesselRepository;
+import com.vt.vtserver.web.rest.dto.VesselDTO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;

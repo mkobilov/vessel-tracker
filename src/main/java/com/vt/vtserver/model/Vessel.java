@@ -1,4 +1,4 @@
-package com.vts.vtsserver.model;
+package com.vt.vtserver.model;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -15,7 +15,7 @@ import java.sql.Timestamp;
 public class Vessel {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "vessel_sequence")  //???
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "vessel_sequence")
     @SequenceGenerator(name="vessel_sequence", sequenceName = "sequence_generator", allocationSize=1)
     @Column(name = "id")
     private Long id;
