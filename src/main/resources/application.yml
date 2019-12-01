@@ -12,9 +12,9 @@ spring:
       ddl-auto: none
   datasource:
     type: com.zaxxer.hikari.HikariDataSource
-    url: jdbc:postgresql://smartgeosystem.ru:5432/vts_db1
-    username: vts_admin
-    password: GisPwd!2019
+    url: jdbc:postgresql://smartgeosystem.ru:5455/vesseldb
+    username: postgres
+    password: password
     hikari:
       poolName: Hikari
       auto-commit: false
