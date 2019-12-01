@@ -31,9 +31,7 @@ public class TargetService {
 
     public List<Target> getAllTargets() {
         try {
-            List<Target> list = targetRepository.findAll();
-
-            return list;
+            return targetRepository.findAll();
         } catch (Exception e) {
             log.error("Service Error getVessel :", e);
             return null;
