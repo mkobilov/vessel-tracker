@@ -13,7 +13,7 @@ build/
 .settings
 .springBeans
 .sts4-cache
-.yml
+
 
 ### IntelliJ IDEA ###
 .idea
@@ -28,6 +28,6 @@ out/
 /dist/
 /nbdist/
 /.nb-gradle/
-
+*.yml
 ### VS Code ###
 .vscode/
