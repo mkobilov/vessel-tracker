@@ -1,28 +1,46 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="UTF-8" ?>
 <databaseChangeLog
         xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd">
 
-    <changeSet id="20191125225100" author="kobilovm">
+    <changeSet id="20191125225100" author="kobilov">
         <createTable tableName="target">
-            <column name="track_number" type="bigint">
-                <constraints primaryKey="true" nullable="false"/>
+            <column name="id" type="bigint">
+                <constraints nullable="false"/>
             </column>
+            <column name="sac" type="serial"/>
+            <column name="sin" type="serial"/>
+            <column name="date_time" type="timestamp with timezone">
+                <constraints nullable="false"/>
+            </column>
+            <column name="lat" type="double"/>
+            <column name="lon" type="double"/>
+            <column name="x" type="serial"/>
+            <column name="y" type="serial"/>
+            <column name="vx" type="serial"/>
+            <column name="vy" type="serial"/>
+            <column name="heading" type="double"/>
+            <column name="speed" type="double"/>
+            <column name="track_nb" type="bigint"/>
+            <column name="cfn" type="serial"/>
+            <column name="fpc" type="serial"/>
+            <column name="mon" type="serial"/>
+            <column name="mrh" type="serial"/>
+            <column name="sim" type="serial"/>
+            <column name="spi" type="serial"/>
+            <column name="src" type="serial"/>
+            <column name="tse" type="serial"/>
 
-            <column name="time" type="timestamp"/>
-            <column name="lat" type="double precision"/>
-            <column name="lon" type="double precision"/>
-            <column name="x" type="double precision"/>
-            <column name="y" type="double precision"/>
-            <column name="vx" type="double precision"/>
-            <column name="vy" type="double precision"/>
-            <column name="heading" type="double precision"/>
-            <column name="speed" type="double precision"/>
-            <column name="status" type="boolean"/>
-
-
+            <column name="creation_time" type="timestamp with timezone"/>
+            <column name="update_time" type="timestamp with timezone"/>
         </createTable>
+
+        <addPrimaryKey
+                columnNames="id, creation_time"
+                tableName="target"
+        />
     </changeSet>
 </databaseChangeLog>
+
         <!--> Not yet used, because of uncertaties with types and data </!-->
