@@ -29,7 +29,7 @@ public class TargetController {
 
     @PostMapping
     public ResponseEntity<Target> postTarget(@RequestBody TargetDTO dto){
-        Target target = targetService.postTarget(dto);
+        Target target = targetService.postTarget(dto, null);
 
         if(target != null)
             return ResponseEntity.ok(target);

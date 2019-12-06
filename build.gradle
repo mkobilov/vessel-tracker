@@ -4,7 +4,7 @@ plugins {
     id 'java'
 }
 
-group = 'com.example'
+group = 'com.vt'
 version = '0.0.1-SNAPSHOT'
 sourceCompatibility = '1.8'
 
@@ -15,10 +15,16 @@ configurations {
 }
 
 repositories {
-    mavenCentral()
-    mavenLocal()
-}
+    flatDir{
+        dirs 'libs'
+    }
 
+    mavenLocal()
+    maven { url 'http://maven.geo-solutions.it/' }
+    maven { url 'http://download.osgeo.org/webdav/geotools/' }
+    mavenCentral()
+}
+def geotoolsVersion = '22.0'
 dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-data-jdbc'
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
@@ -28,6 +34,19 @@ dependencies {
     runtimeOnly 'org.postgresql:postgresql'
     annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
     annotationProcessor 'org.projectlombok:lombok'
+
+    compile group: 'net.postgis', name: 'postgis-jdbc', version: '2.2.1'
+
+    compile group: 'org.geotools', name: 'gt-shapefile', version: geotoolsVersion
+    compile group: 'org.geotools', name: 'gt-swing', version: geotoolsVersion
+    compile group: 'org.geotools', name: 'gt-epsg-hsql', version: geotoolsVersion
+    compile group: 'org.geotools', name: 'gt-geometry', version: geotoolsVersion
+    compile group: 'org.geotools', name: 'gt-opengis', version: geotoolsVersion
+    compile group: 'org.geotools.jdbc', name: 'gt-jdbc-postgis', version: geotoolsVersion
+    compile group: 'org.geotools', name: 'gt-jdbc', version: geotoolsVersion
+
+    compile group: 'jlg-consulting', name: 'jade', version: '0.9.36'
+
     testImplementation('org.springframework.boot:spring-boot-starter-test') {
         exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
     }

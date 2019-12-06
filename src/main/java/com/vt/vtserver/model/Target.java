@@ -3,9 +3,14 @@ package com.vt.vtserver.model;
 
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
+import org.hibernate.annotations.Type;
+import org.hibernate.annotations.TypeDef;
+import org.hibernate.annotations.TypeDefs;
+
 
 import javax.persistence.*;
 import java.sql.Timestamp;
+import java.time.OffsetDateTime;
 
 @Entity
 @Data
@@ -19,21 +24,21 @@ public class Target {
     @Column(name = "id")
     private Long id;
     @Column(name = "track_nb")
-    private Long track_number;
+    private Long trackNumber;
 
-    private Timestamp dateTime;
-
-    private Double sin;
-    private Double sac;
-
-    private Double lat;
-    private Double lon;
     private Double x;
     private Double y;
     private Double vx;
     private Double vy;
     private Double heading;
     private Double speed;
+
+    private int sac;
+    private int sin;
+    private OffsetDateTime dateTime;
+    private double lat;
+    private double lon;
+
 
     private int cfn;
     private int fpc;
@@ -44,8 +49,9 @@ public class Target {
     private int src;
     private int tse;
 
+
     @Column(name = "creation_time")
-    private Timestamp creationTime;
+    private OffsetDateTime creationTime;
     @Column(name = "update_time")
-    private Timestamp updateTime;
+    private OffsetDateTime updateTime;
 }

@@ -1,19 +1,37 @@
 package com.vt.vtserver.web.rest.dto;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
 
 import java.sql.Timestamp;
+import java.time.OffsetDateTime;
 
 @Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class TargetDTO {
-    private Timestamp dateTime;
 
-    private Double lat;
-    private Double lon;
-    private Double x;
-    private Double y;
-    private Double vx;
-    private Double vy;
-    private Double heading;
-    private Double speed;
+
+    int sac;
+    int sin;
+    OffsetDateTime dateTime;
+    double lat;
+    double lon;
+    int latitudeWsg84;
+    int latitudeWsg841;
+    int vx;
+    int vy;
+    Long trackNumber;
+    int cfn;
+    int fpc;
+    int mon;
+    int mrh;
+    int sim;
+    int spi;
+    int src;
+    int tse;
+
+
 }
