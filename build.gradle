@@ -45,6 +45,8 @@ dependencies {
     compile group: 'org.geotools.jdbc', name: 'gt-jdbc-postgis', version: geotoolsVersion
     compile group: 'org.geotools', name: 'gt-jdbc', version: geotoolsVersion
 
+    compile("org.springframework.boot:spring-boot-starter-amqp")
+
     compile group: 'jlg-consulting', name: 'jade', version: '0.9.36'
 
     testImplementation('org.springframework.boot:spring-boot-starter-test') {

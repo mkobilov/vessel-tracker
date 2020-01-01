@@ -91,19 +91,19 @@ public class RadarDatagramConverter implements Runnable{
                                         now.getMonth(), now.getDayOfMonth(), record.getItem070().getHours(),
                                         record.getItem070().getMinutes(), record.getItem070().getSeconds()),
                                         ZoneOffset.UTC);
-                                System.out.println(record.getDebugString());
+                                //System.out.println(record.getDebugString());
                             }
 
                             asterixDecodingReport.update(adb);
                         }
                         index++;
 
-                        System.out.println("Processed " +
-                                numberOfQueueItems + " datagrams/packets (" +
-                                numberOfReceivedBytes +
-                                ") bytes (" + numberOfReceivedBytesFinalFrame + ") received bytes in " +
-                                "FF. Elapsed time " +
-                                (System.currentTimeMillis() - startTime) / 1000 + " sec");
+//                        System.out.println("Processed " +
+//                                numberOfQueueItems + " datagrams/packets (" +
+//                                numberOfReceivedBytes +
+//                                ") bytes (" + numberOfReceivedBytesFinalFrame + ") received bytes in " +
+//                                "FF. Elapsed time " +
+//                                (System.currentTimeMillis() - startTime) / 1000 + " sec");
                     }
 
                     // Write radar targets to database
@@ -140,7 +140,10 @@ public class RadarDatagramConverter implements Runnable{
                                     record.getItem080().getSrcValue(),
                                     record.getItem080().getTseValue()
                             );
+
                             this.radarDataWriter.writeRadar(dto, now);
+
+
                         }
                         asterixDecodingReport.update(adb);
                     }

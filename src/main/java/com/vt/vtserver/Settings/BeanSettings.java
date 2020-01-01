@@ -7,6 +7,7 @@ import com.vt.vtserver.service.Asterix.RadarDataWriter;
 import com.vt.vtserver.service.Asterix.TcpManager;
 import lombok.RequiredArgsConstructor;
 import org.opengis.referencing.FactoryException;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Service;
 
@@ -18,9 +19,10 @@ import java.util.concurrent.BlockingQueue;
 public class BeanSettings {
     private final ApplicationProperties applicationProperties;
     private final TargetRepository radarTargetRepository;
+    private  final RabbitTemplate rabbitTemplate;
     private final BlockingQueue<byte[]> rawQueueRadar;
     @Bean
-    RadarDataWriter radarDataWriter() throws FactoryException { return new RadarDataWriter(radarTargetRepository); }
+    RadarDataWriter radarDataWriter() throws FactoryException { return new RadarDataWriter(radarTargetRepository, rabbitTemplate, applicationProperties); }
 
 
     @PostConstruct
