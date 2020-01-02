@@ -1,19 +1,29 @@
 package com.vt.vtserver.service.Messaging;
 
+import com.vt.vtserver.model.Alarm;
 import com.vt.vtserver.model.StationaryObject;
+import com.vt.vtserver.repository.AlarmRepository;
 import com.vt.vtserver.repository.StationaryObjectRepository;
+import com.vt.vtserver.service.AlarmService;
 import com.vt.vtserver.service.StationaryObjectService;
+import com.vt.vtserver.web.rest.dto.AlarmDTO;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+import org.springframework.util.Assert;
 
 import java.util.List;
 
+@Service
 @RequiredArgsConstructor
 public class GeoUtils {
-
-    private final StationaryObjectService stationaryObjectService;
+    private final StationaryObjectRepository stationaryObjectRepository;
+    private final AlarmRepository alarmRepository;
     private final double MINIMUM_RANGE = 8;
+
+
 
     @AllArgsConstructor
     private class AlarmInfoUnit{
@@ -23,11 +33,17 @@ public class GeoUtils {
     }
 
     public void CheckOnCollision(MessageUnit messageUnit){
-        //Todo check method
+        assert alarmRepository != null;
+        assert stationaryObjectRepository != null;
+        AlarmService alarmService = new AlarmService(alarmRepository);
+        StationaryObjectService stationaryObjectService = new StationaryObjectService(stationaryObjectRepository);
+
         List<StationaryObject> stationaryObjectList = stationaryObjectService.getAllStationaryObjects();
         for (StationaryObject object : stationaryObjectList) {
-            if(CheckOnCollisionWithObject(messageUnit, object).collision_detected){
-                //Todo alarm method
+            AlarmInfoUnit alarmInfoUnit = CheckOnCollisionWithObject(messageUnit, object);
+            if(alarmInfoUnit.collision_detected){
+                alarmService.postAlarm(new AlarmDTO(messageUnit.id, object.getId(),
+                                         alarmInfoUnit.tmin, alarmInfoUnit.rmin));
                 return;
             }
         }

@@ -18,5 +18,6 @@
     <include file="db/liquibase/changes/20191201172500_create_hypertable_target.xml"/>
     <include file="db/liquibase/changes/20200101144500_stationary_object_sequence_generator.xml"/>
     <include file="db/liquibase/changes/20200101155200_alarm_table_create.xml"/>
+    <include file="db/liquibase/changes/20200101180600_stationary_object_add_xy_columns.xml"/>
 
 </databaseChangeLog>

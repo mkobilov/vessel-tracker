@@ -1,8 +1,9 @@
 package com.vt.vtserver.config;
 
+import com.vt.vtserver.repository.AlarmRepository;
+import com.vt.vtserver.repository.StationaryObjectRepository;
 import com.vt.vtserver.service.Messaging.GeoUtils;
 import com.vt.vtserver.service.Messaging.Receiver;
-import com.vt.vtserver.service.StationaryObjectService;
 import org.springframework.amqp.core.Binding;
 import org.springframework.amqp.core.BindingBuilder;
 import org.springframework.amqp.core.Queue;
@@ -29,8 +30,11 @@ public class RabbitMQConfiguration {
 
     @Autowired
     RabbitTemplate rabbitTemplate;
+    @Autowired
+    GeoUtils geoUtils;
 
-    StationaryObjectService stationaryObjectService;
+    public RabbitMQConfiguration() {
+    }
 
 
     @Bean
@@ -60,7 +64,7 @@ public class RabbitMQConfiguration {
 
     @Bean
     Receiver receiver() {
-        GeoUtils geoUtils = new GeoUtils(stationaryObjectService);
+        //GeoUtils geoUtils = new GeoUtils();
         return new Receiver(geoUtils);
     }
 
