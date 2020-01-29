@@ -64,7 +64,6 @@ public class RabbitMQConfiguration {
 
     @Bean
     Receiver receiver() {
-        //GeoUtils geoUtils = new GeoUtils();
         return new Receiver(geoUtils);
     }
 

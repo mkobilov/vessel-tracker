@@ -37,14 +37,14 @@ public class VesselService {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
     }
-    public ResponseEntity<List<Vessel>> getVessel(){
+    public List<Vessel> getAll(){
         try {
             List<Vessel> list = vesselRepository.findAll();
 
-            return new ResponseEntity<>(list, HttpStatus.OK);
+            return list;
         } catch (Exception e) {
             log.error("Service Error getVessel :", e);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+            return null;
         }
     }
     public ResponseEntity<Vessel> getVessel(Long id){

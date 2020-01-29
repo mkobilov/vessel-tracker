@@ -26,4 +26,8 @@ public class StationaryObject {
 
     @Column(columnDefinition = "boolean default false")
     private Boolean deleted = false;
+
+    public StationaryObject(){
+
+    }
 }

@@ -49,7 +49,7 @@ public class TcpReader implements Runnable {
         try {
             createSocketListener(listenerId);
         } catch (Exception e) {
-            log.error("Error in " + listenerId);
+            log.error("Error in " + listenerId,e);
         }
     }
     

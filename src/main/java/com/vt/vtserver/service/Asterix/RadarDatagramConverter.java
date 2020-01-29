@@ -6,6 +6,7 @@ import jlg.jade.asterix.AsterixDecoder;
 import jlg.jade.asterix.AsterixRecord;
 import jlg.jade.asterix.cat062.Cat062Record;
 import jlg.jade.asterix.counters.DefaultDecodingReport;
+import lombok.extern.slf4j.Slf4j;
 import org.opengis.referencing.FactoryException;
 import org.springframework.stereotype.Component;
 
@@ -17,13 +18,14 @@ import java.util.List;
 import java.util.concurrent.BlockingQueue;
 
 @Component
+@Slf4j
 public class RadarDatagramConverter implements Runnable{
     private final BlockingQueue<byte[]> rawQueue;
     private boolean isLogEnabled = false;
     private int numberOfQueueItems;
     private int numberOfReceivedBytes;
     private int numberOfReceivedBytesFinalFrame;
-
+    //Category of ASTERIX
     private String allowedCategories = "62";
     private final RadarDataWriter radarDataWriter;
 
@@ -49,21 +51,7 @@ public class RadarDatagramConverter implements Runnable{
         if (allowedCategories.contains("62")) {
             categoriesToDecode.add(62);
         }
-        if (allowedCategories.contains("65")) {
-            categoriesToDecode.add(65);
-        }
-        if (allowedCategories.contains("4")) {
-            categoriesToDecode.add(4);
-        }
-        if(allowedCategories.contains("150")){
-            categoriesToDecode.add(150);
-        }
-        if(allowedCategories.contains("48")){
-            categoriesToDecode.add(48);
-        }
-        if(allowedCategories.contains("34")){
-            categoriesToDecode.add(34);
-        }
+
 
         AsterixDecoder asterixDecoder = new AsterixDecoder(categoriesToDecode);
 
@@ -127,7 +115,7 @@ public class RadarDatagramConverter implements Runnable{
                                     latImpl,
                                     lonImpl,
                                     record.getItem105().getLatitudeWsg84(),
-                                    record.getItem105().getLatitudeWsg84(),
+                                    record.getItem105().getLongitudeWsg84(),
                                     record.getItem185().getVx(),
                                     record.getItem185().getVy(),
                                     Long.valueOf(record.getItem040().getTrackNb()),
@@ -150,11 +138,11 @@ public class RadarDatagramConverter implements Runnable{
 
 
                 } catch (Exception e) {
-                    e.printStackTrace();
+                    log.error("ASTERIX parse error" + e);
                 }
 
             } catch (InterruptedException e) {
-                e.printStackTrace();
+                log.error("ASTERIX parse error, raw queue" + e);
             }
         }
     }

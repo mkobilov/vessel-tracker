@@ -20,7 +20,7 @@ public class TargetDTO {
     double lat;
     double lon;
     int latitudeWsg84;
-    int latitudeWsg841;
+    int longtitudeWsg84;
     int vx;
     int vy;
     Long trackNumber;

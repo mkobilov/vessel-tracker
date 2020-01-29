@@ -5,6 +5,7 @@ import com.vt.vtserver.service.VesselService;
 import com.vt.vtserver.web.rest.dto.VesselDTO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -29,7 +30,10 @@ public class VesselController {
 
     @GetMapping
     public ResponseEntity<List<Vessel>> getVessel(){
-        return vesselService.getVessel();
+        List<Vessel> list = vesselService.getAll();
+        if(list != null)
+            return ResponseEntity.ok(list);
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
     }
     @GetMapping("/{id}")
     public ResponseEntity<Vessel> getVessel(@PathVariable("id") Long id){
