@@ -20,18 +20,18 @@ public class TargetController {
     private final TargetService targetService;
 
     @GetMapping
-    public ResponseEntity<List<Target>> getAllTargets(){
+    public ResponseEntity<List<Target>> getAllTargets() {
         List<Target> list = targetService.getAllTargets();
-        if(list != null)
+        if (list != null)
             return ResponseEntity.ok(list);
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
     }
 
     @PostMapping
-    public ResponseEntity<Target> postTarget(@RequestBody TargetDTO dto){
-        Target target = targetService.postTarget(dto, null);
+    public ResponseEntity<Target> postTarget(@RequestBody TargetDTO dto) {
+        Target target = targetService.postTarget(dto);
 
-        if(target != null)
+        if (target != null)
             return ResponseEntity.ok(target);
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
     }

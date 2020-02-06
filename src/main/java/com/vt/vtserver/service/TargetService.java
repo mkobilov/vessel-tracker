@@ -7,8 +7,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import java.sql.Timestamp;
 import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 import java.util.List;
 
 @Service
@@ -37,7 +37,6 @@ public class TargetService {
         target.setVy((double) dto.getVy());
 
 
-
         target.setDateTime(dto.getDateTime());
     }
 
@@ -50,16 +49,17 @@ public class TargetService {
         }
     }
 
-    public Target postTarget(TargetDTO dto, OffsetDateTime creationTime) {
+    public Target postTarget(TargetDTO dto) {
         try {
             log.debug("postVessel start");
             Target target = new Target();
             changeTarget(target, dto);
-            target.setCreationTime(creationTime);
+            target.setCreationTime(OffsetDateTime.now(ZoneOffset.UTC));
+            target.setDateTime(OffsetDateTime.now(ZoneOffset.UTC));
             target = targetRepository.save(target);
 
             return target;
-        }catch (Exception e){
+        } catch (Exception e) {
             log.error("Error posting new vessel" + dto, e);
             return null;
         }

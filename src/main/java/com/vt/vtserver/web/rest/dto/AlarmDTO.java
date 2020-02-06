@@ -3,14 +3,16 @@ package com.vt.vtserver.web.rest.dto;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
+import java.sql.Timestamp;
+
 @AllArgsConstructor
 @Data
 public class AlarmDTO {
-    private Long vessel_id;
-    private Long collision_object_id;
+    private Long vesselTrackNumber;
+    private Long collisionObjectId;
 
     //Time in seconds until collision
-    private Double tmin;
+    private Timestamp collisionTime;
     //Minimal range between vessel and collision object
     private Double rmin;
 }

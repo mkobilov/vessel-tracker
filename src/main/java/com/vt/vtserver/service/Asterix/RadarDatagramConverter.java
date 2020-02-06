@@ -57,6 +57,7 @@ public class RadarDatagramConverter implements Runnable{
 
         long startTime = System.currentTimeMillis();
         int index = 0;
+        //todo clean
         while (true) {
             try {
                 byte[] rawData = rawQueue.take();
@@ -79,19 +80,12 @@ public class RadarDatagramConverter implements Runnable{
                                         now.getMonth(), now.getDayOfMonth(), record.getItem070().getHours(),
                                         record.getItem070().getMinutes(), record.getItem070().getSeconds()),
                                         ZoneOffset.UTC);
-                                //System.out.println(record.getDebugString());
                             }
 
                             asterixDecodingReport.update(adb);
                         }
                         index++;
 
-//                        System.out.println("Processed " +
-//                                numberOfQueueItems + " datagrams/packets (" +
-//                                numberOfReceivedBytes +
-//                                ") bytes (" + numberOfReceivedBytesFinalFrame + ") received bytes in " +
-//                                "FF. Elapsed time " +
-//                                (System.currentTimeMillis() - startTime) / 1000 + " sec");
                     }
 
                     // Write radar targets to database
@@ -118,7 +112,7 @@ public class RadarDatagramConverter implements Runnable{
                                     record.getItem105().getLongitudeWsg84(),
                                     record.getItem185().getVx(),
                                     record.getItem185().getVy(),
-                                    Long.valueOf(record.getItem040().getTrackNb()),
+                                    (long) record.getItem040().getTrackNb(),
                                     record.getItem080().getCfnValue(),
                                     record.getItem080().getFpcValue(),
                                     record.getItem080().getMonValue(),
@@ -139,6 +133,7 @@ public class RadarDatagramConverter implements Runnable{
 
                 } catch (Exception e) {
                     log.error("ASTERIX parse error" + e);
+                    rawQueue.clear();
                 }
 
             } catch (InterruptedException e) {
@@ -146,4 +141,19 @@ public class RadarDatagramConverter implements Runnable{
             }
         }
     }
+
+
+    private static final char[] HEX_ARRAY = "0123456789ABCDEF".toCharArray();
+
+    public static String bytesToHex(byte[] bytes) {
+        char[] hexChars = new char[bytes.length * 2];
+        for (int j = 0; j < bytes.length; j++) {
+            int v = bytes[j] & 0xFF;
+            hexChars[j * 2] = HEX_ARRAY[v >>> 4];
+            hexChars[j * 2 + 1] = HEX_ARRAY[v & 0x0F];
+        }
+        return new String(hexChars);
+    }
+
+
 }

@@ -35,6 +35,7 @@ dependencies {
     annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
     annotationProcessor 'org.projectlombok:lombok'
 
+
     compile group: 'net.postgis', name: 'postgis-jdbc', version: '2.2.1'
 
     compile group: 'org.geotools', name: 'gt-shapefile', version: geotoolsVersion
@@ -46,6 +47,17 @@ dependencies {
     compile group: 'org.geotools', name: 'gt-jdbc', version: geotoolsVersion
 
     compile("org.springframework.boot:spring-boot-starter-amqp")
+
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
+    // https://mvnrepository.com/artifact/io.micrometer/micrometer-core
+    compile group: 'io.micrometer', name: 'micrometer-core'
+    // https://mvnrepository.com/artifact/io.micrometer/micrometer-registry-prometheus
+    compile group: 'io.micrometer', name: 'micrometer-registry-prometheus'
+
+
+    compile 'org.springframework.metrics:spring-metrics:latest.release'
+    compile 'io.prometheus:simpleclient_common:latest.release'
+
 
     compile group: 'jlg-consulting', name: 'jade', version: '0.9.36'
 

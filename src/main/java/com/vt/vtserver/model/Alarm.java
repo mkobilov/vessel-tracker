@@ -5,6 +5,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.sql.Timestamp;
 
 @Entity
 @Table(name = "alarm")
@@ -14,15 +15,18 @@ import javax.persistence.*;
 public class Alarm {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "vessel_sequence")
-    @SequenceGenerator(name="vessel_sequence", sequenceName = "alarm_sequence_generator", allocationSize=1)
+    @SequenceGenerator(name = "vessel_sequence", sequenceName = "sequence_generator", allocationSize = 1)
     @Column(name = "id")
     private Long id;
-
-    private Long vessel_id;
-    private Long collision_object_id;
+    @Column(name = "vessel_track_number")
+    private Long vesselTrackNumber;
+    @Column(name = "collision_object_id")
+    private Long collisionObjectId;
 
     //Time in seconds until collision
-    private Double tmin;
+    @Column(name = "time_of_collision")
+    private Timestamp collisionTime;
     //Minimal range between vessel and collision object
+    @Column(name = "minimal_range")
     private Double rmin;
 }

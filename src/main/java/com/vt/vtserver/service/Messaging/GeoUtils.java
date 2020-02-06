@@ -1,23 +1,19 @@
 package com.vt.vtserver.service.Messaging;
 
-import com.vt.vtserver.model.Alarm;
 import com.vt.vtserver.model.StationaryObject;
-import com.vt.vtserver.model.Vessel;
 import com.vt.vtserver.repository.AlarmRepository;
 import com.vt.vtserver.repository.StationaryObjectRepository;
 import com.vt.vtserver.repository.VesselRepository;
 import com.vt.vtserver.service.AlarmService;
 import com.vt.vtserver.service.StationaryObjectService;
-import com.vt.vtserver.service.VesselService;
 import com.vt.vtserver.web.rest.dto.AlarmDTO;
+import io.micrometer.core.annotation.Timed;
 import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import org.springframework.util.Assert;
 
+import java.sql.Timestamp;
 import java.util.List;
 
 @Service
@@ -30,30 +26,35 @@ public class GeoUtils {
     private final double MINIMUM_RANGE = 8;
 
 
-
     @AllArgsConstructor
-    private class AlarmInfoUnit{
+    private static class AlarmInfoUnit {
         public double rmin;
         public double tmin;
         public boolean collision_detected;
     }
 
-    public void CheckOnCollision(MessageUnit messageUnit){
+    @Timed(
+            value = "CheckOnCollision"
+    )
+    public void CheckOnCollision(MessageUnit messageUnit) {
         AlarmService alarmService = new AlarmService(alarmRepository);
         StationaryObjectService stationaryObjectService = new StationaryObjectService(stationaryObjectRepository);
-        VesselService vesselService = new VesselService(vesselRepository);
+        //VesselService vesselService = new VesselService(vesselRepository);
 
         List<StationaryObject> stationaryObjectList = stationaryObjectService.getAllStationaryObjects();
         for (StationaryObject object : stationaryObjectList) {
             AlarmInfoUnit alarmInfoUnit = CheckOnCollisionWithObject(messageUnit, object);
-            if(alarmInfoUnit.collision_detected){
-                alarmService.postAlarm(new AlarmDTO(messageUnit.id, object.getId(),
-                                         alarmInfoUnit.tmin, alarmInfoUnit.rmin));
-                log.warn("Collision incoming" + object.getId());
+            if (alarmInfoUnit.collision_detected) {
+                Timestamp collisionTime = new Timestamp(System.currentTimeMillis() + (long) (1000*alarmInfoUnit.tmin));
+
+                AlarmDTO dto = new AlarmDTO(messageUnit.id, object.getId(),
+                        collisionTime, alarmInfoUnit.rmin);
+                alarmService.deletePreviousAlarm(dto);
+                alarmService.postAlarm(dto);
                 return;
             }
         }
-        List<Vessel> vesselList = vesselService.getAll();
+        /*List<Vessel> vesselList = vesselService.getAll();
         for(Vessel vessel : vesselList){
             AlarmInfoUnit alarmInfoUnit = CheckOnCollisionWithVessel(messageUnit, vessel);
             if(alarmInfoUnit.collision_detected){
@@ -61,11 +62,11 @@ public class GeoUtils {
                         alarmInfoUnit.tmin, alarmInfoUnit.rmin));
                 return;
             }
-        }
+        }*/
 
     }
 
-    private AlarmInfoUnit CheckOnCollisionWithObject(MessageUnit messageUnit, StationaryObject stationaryObject){
+    private AlarmInfoUnit CheckOnCollisionWithObject(MessageUnit messageUnit, StationaryObject stationaryObject) {
         double x0 = messageUnit.x;
         double y0 = messageUnit.y;
         double vx = messageUnit.vx;
@@ -75,13 +76,13 @@ public class GeoUtils {
         double y1 = stationaryObject.getY();
         //time (in seconds, from the moment of calculation)
         // when distance between vessel and stationary object hits its minimum value
-        double tmin = -(vx*(x0-x1)+vy*(y0-y1))/(vx*vx + vy*vy);
-        double rmin = Math.sqrt(Math.scalb((x0-x1+vx*tmin),2) +
-                      Math.scalb((y0-y1+vx*tmin),2));
+        double tmin = -(vx * (x0 - x1) + vy * (y0 - y1)) / (vx * vx + vy * vy);
+        double rmin = Math.sqrt(Math.scalb((x0 - x1 + vx * tmin), 2) +
+                Math.scalb((y0 - y1 + vx * tmin), 2));
 
-        return new AlarmInfoUnit(rmin, tmin, rmin <= MINIMUM_RANGE);
+        return new AlarmInfoUnit(rmin, tmin, (rmin <= MINIMUM_RANGE) && tmin > 0);
     }
-    private AlarmInfoUnit CheckOnCollisionWithVessel(MessageUnit messageUnit, Vessel vessel){
+    /*private AlarmInfoUnit CheckOnCollisionWithVessel(MessageUnit messageUnit, Vessel vessel){
         double x01 = messageUnit.x;
         double y01 = messageUnit.y;
         double vx1 = messageUnit.vx;
@@ -98,5 +99,5 @@ public class GeoUtils {
                 Math.scalb((y02-y01+vy2*tmin-vy1*tmin),2));
 
         return new AlarmInfoUnit(rmin, tmin, rmin <= MINIMUM_RANGE);
-    }
+    }*/
 }
