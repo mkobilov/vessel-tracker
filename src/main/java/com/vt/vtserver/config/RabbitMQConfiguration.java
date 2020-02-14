@@ -59,6 +59,7 @@ public class RabbitMQConfiguration {
         container.setQueueNames(applicationProperties.getQueue());
         container.setMessageListener(listenerAdapter);
         container.setConcurrentConsumers(10);
+        //container.getActiveConsumerCount();
         return container;
     }
 

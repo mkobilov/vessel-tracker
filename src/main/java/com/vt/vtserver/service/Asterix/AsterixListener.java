@@ -8,6 +8,7 @@ import org.opengis.referencing.FactoryException;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadPoolExecutor;
 
 @Slf4j
 public class AsterixListener {
@@ -51,14 +52,6 @@ public class AsterixListener {
 
     }
 
-//    private static void ParseUdpUnicastData(BlockingQueue<byte[]> rawQueue, String[] args) {
-//        UdpReader reader = new UdpReader(rawQueue, args);
-//        DatagramConverter converter = new DatagramConverter(rawQueue,args);
-//
-//        ExecutorService executorService = Executors.newFixedThreadPool(2);
-//        executorService.submit(reader);
-//        executorService.submit(converter);
-//    }
 
     private static void ParseTcpData(BlockingQueue<byte[]> rawRadarQueue,
                                      RadarDataWriter radarDataWriter, TcpManager tcpManager) throws FactoryException {
@@ -66,9 +59,11 @@ public class AsterixListener {
         RadarDatagramConverter radarDatagramConverter =
                 new RadarDatagramConverter(rawRadarQueue, radarDataWriter);
 
-        ExecutorService radarExecutorService = Executors.newFixedThreadPool(2);
+        ThreadPoolExecutor radarExecutorService = (ThreadPoolExecutor) Executors.newFixedThreadPool(2);
         radarExecutorService.submit(tcpRadarReader);
         radarExecutorService.submit(radarDatagramConverter);
+
+
     }
 }
 

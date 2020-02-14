@@ -106,8 +106,9 @@ public class RadarDatagramConverter implements Runnable{
                                     record.getItem010().getSac(),
                                     record.getItem010().getSic(),
                                     dt,
-                                    latImpl,
+                                    //TODO CHECK WITH REAL DATA, MB ERR HERE
                                     lonImpl,
+                                    latImpl,
                                     record.getItem105().getLatitudeWsg84(),
                                     record.getItem105().getLongitudeWsg84(),
                                     record.getItem185().getVx(),

@@ -32,8 +32,6 @@
             <column name="src" type="serial"/>
             <column name="tse" type="serial"/>
 
-            <column name="stationary_object" type="smallint"/>
-
             <column name="creation_time" type="timestamp with timezone"/>
             <column name="update_time" type="timestamp with timezone"/>
         </createTable>

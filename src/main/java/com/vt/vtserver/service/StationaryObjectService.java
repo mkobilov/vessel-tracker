@@ -26,6 +26,9 @@ import java.util.List;
 public class StationaryObjectService {
     private final StationaryObjectRepository stationaryObjectRepository;
 
+    private final TargetService targetService;
+
+
     public List<StationaryObject> getAllStationaryObjects() {
         try {
             return stationaryObjectRepository.findAll();
@@ -55,6 +58,8 @@ public class StationaryObjectService {
             stationaryObject.setY(geometry.getCoordinate().y);
 
             stationaryObjectRepository.save(stationaryObject);
+            //crutch for a worldmap graphana plugin
+            targetService.postStationaryObject(stationaryObject, dto.getTrackNumber());
 
             return stationaryObject;
         }
@@ -70,13 +75,14 @@ public class StationaryObjectService {
             stationaryObject.setX(dto.getX());
             stationaryObject.setY(dto.getY());
 
-            Point sourcePoint  =geometryFactory.createPoint(new Coordinate(dto.getX(), dto.getY()));
+            Point sourcePoint = geometryFactory.createPoint(new Coordinate(dto.getX(), dto.getY()));
             Geometry geometry = JTS.transform(sourcePoint,mathTransform);
-            stationaryObject.setLon(geometry.getCoordinate().x);
-            stationaryObject.setLat(geometry.getCoordinate().y);
+            stationaryObject.setLon(geometry.getCoordinate().y);
+            stationaryObject.setLat(geometry.getCoordinate().x);
 
             stationaryObjectRepository.save(stationaryObject);
-
+            //crutch for a worldmap graphana plugin
+            targetService.postStationaryObject(stationaryObject, dto.getTrackNumber());
             return stationaryObject;
         }
         else{

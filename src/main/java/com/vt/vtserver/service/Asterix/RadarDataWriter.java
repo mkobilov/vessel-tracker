@@ -56,8 +56,8 @@ public class RadarDataWriter {
         double v = Math.sqrt(dVx * dVx + dVy * dVy);
         double heading;
         heading = Math.atan2(dVy, dVx) * 180 / Math.PI;
-
-        Point sourcePoint = geometryFactory.createPoint(new Coordinate(dto.getLon(), dto.getLat()));
+        //TODO MB ERR HERE CHECK WITH REAL DATA
+        Point sourcePoint = geometryFactory.createPoint(new Coordinate( dto.getLat(), dto.getLon()));
         sourcePoint.setSRID(4326);
         Geometry geometry = JTS.transform(sourcePoint, mathTransform);
         double x = geometry.getCoordinate().getX();

@@ -49,6 +49,9 @@ public class Target {
     private int src;
     private int tse;
 
+    //crutch for grafana worldmap plugin
+    @Column(name = "stationary_object")
+    private short stationaryObject;
 
     @Column(name = "creation_time")
     private OffsetDateTime creationTime;

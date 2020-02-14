@@ -20,10 +20,12 @@ import java.util.List;
 @RequiredArgsConstructor
 @Slf4j
 public class GeoUtils {
-    private final StationaryObjectRepository stationaryObjectRepository;
+    //private final StationaryObjectRepository stationaryObjectRepository;
+    private final StationaryObjectService stationaryObjectService;
     private final VesselRepository vesselRepository;
     private final AlarmRepository alarmRepository;
-    private final double MINIMUM_RANGE = 8;
+    //Todo change
+    private final double MINIMUM_RANGE = 30;
 
 
     @AllArgsConstructor
@@ -34,18 +36,18 @@ public class GeoUtils {
     }
 
     @Timed(
-            value = "CheckOnCollision"
+            value = "CollisionServise.aspect"
     )
     public void CheckOnCollision(MessageUnit messageUnit) {
         AlarmService alarmService = new AlarmService(alarmRepository);
-        StationaryObjectService stationaryObjectService = new StationaryObjectService(stationaryObjectRepository);
+       // StationaryObjectService stationaryObjectService = new StationaryObjectService(stationaryObjectRepository);
         //VesselService vesselService = new VesselService(vesselRepository);
 
         List<StationaryObject> stationaryObjectList = stationaryObjectService.getAllStationaryObjects();
         for (StationaryObject object : stationaryObjectList) {
             AlarmInfoUnit alarmInfoUnit = CheckOnCollisionWithObject(messageUnit, object);
             if (alarmInfoUnit.collision_detected) {
-                Timestamp collisionTime = new Timestamp(System.currentTimeMillis() + (long) (1000*alarmInfoUnit.tmin));
+                Timestamp collisionTime = new Timestamp(System.currentTimeMillis() + (long) (1000 * alarmInfoUnit.tmin));
 
                 AlarmDTO dto = new AlarmDTO(messageUnit.id, object.getId(),
                         collisionTime, alarmInfoUnit.rmin);

@@ -16,6 +16,8 @@ public class StationaryObjectDTO {
 
     Double lat;
     Double lon;
+    //crutch for worldmap grafana plugin
+    Long trackNumber;
 
     Double x;
     Double y;

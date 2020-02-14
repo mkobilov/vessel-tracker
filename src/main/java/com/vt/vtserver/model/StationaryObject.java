@@ -24,6 +24,7 @@ public class StationaryObject {
     private Double lat;
     private Double lon;
 
+
     @Column(columnDefinition = "boolean default false")
     private Boolean deleted = false;
 

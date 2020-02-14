@@ -1,5 +1,6 @@
 package com.vt.vtserver.service;
 
+import com.vt.vtserver.model.StationaryObject;
 import com.vt.vtserver.model.Target;
 import com.vt.vtserver.repository.TargetRepository;
 import com.vt.vtserver.web.rest.dto.TargetDTO;
@@ -46,6 +47,28 @@ public class TargetService {
         } catch (Exception e) {
             log.error("Service Error getVessel :", e);
             return null;
+        }
+    }
+
+
+    //This method is a crutch for grafana worldmap plugin, sadly it can only
+    //work with one query at a time
+    public void postStationaryObject(StationaryObject stationaryObject, Long trackNumber) {
+        try {
+            Target target = new Target();
+            target.setCreationTime(OffsetDateTime.now(ZoneOffset.UTC));
+            target.setDateTime(OffsetDateTime.now(ZoneOffset.UTC));
+            target.setLat(stationaryObject.getLat());
+            target.setLon(stationaryObject.getLon());
+            target.setTrackNumber(trackNumber);
+
+            target.setVx((double) 0);
+            target.setVy((double) 0);
+
+            target.setStationaryObject((short) 1);
+            targetRepository.save(target);
+        } catch (Exception e) {
+            log.error("Err translating stationaryobject into target", e);
         }
     }
 

@@ -5,11 +5,14 @@ import com.vt.vtserver.repository.AlarmRepository;
 import com.vt.vtserver.web.rest.dto.AlarmDTO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
 
+import javax.annotation.PostConstruct;
 import java.util.List;
 
 @Slf4j
 @RequiredArgsConstructor
+@Service
 public class AlarmService {
     private final AlarmRepository alarmRepository;
 
@@ -35,5 +38,10 @@ public class AlarmService {
 
         List<Alarm> list = alarmRepository.deleteByVesselTrackNumberAndCollisionObjectId(dto.getVesselTrackNumber(),
                 dto.getCollisionObjectId());
+    }
+
+    @PostConstruct
+    public void deleteAllAlarms(){
+        alarmRepository.deleteAll();
     }
 }
