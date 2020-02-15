@@ -4,6 +4,7 @@ import com.vt.vtserver.repository.AlarmRepository;
 import com.vt.vtserver.repository.StationaryObjectRepository;
 import com.vt.vtserver.service.Messaging.GeoUtils;
 import com.vt.vtserver.service.Messaging.Receiver;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.core.Binding;
 import org.springframework.amqp.core.BindingBuilder;
 import org.springframework.amqp.core.Queue;
@@ -27,7 +28,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 public class RabbitMQConfiguration {
     @Autowired
     ApplicationProperties applicationProperties;
-
     @Autowired
     RabbitTemplate rabbitTemplate;
     @Autowired
@@ -59,7 +59,6 @@ public class RabbitMQConfiguration {
         container.setQueueNames(applicationProperties.getQueue());
         container.setMessageListener(listenerAdapter);
         container.setConcurrentConsumers(10);
-        //container.getActiveConsumerCount();
         return container;
     }
 

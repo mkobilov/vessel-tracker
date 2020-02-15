@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import java.sql.Timestamp;
+import java.time.OffsetDateTime;
 
 @Entity
 @Table(name = "alarm")
@@ -22,11 +23,13 @@ public class Alarm {
     private Long vesselTrackNumber;
     @Column(name = "collision_object_id")
     private Long collisionObjectId;
-
     //Time in seconds until collision
     @Column(name = "time_of_collision")
     private Timestamp collisionTime;
     //Minimal range between vessel and collision object
     @Column(name = "minimal_range")
     private Double rmin;
+
+    @Column(name = "creation_time")
+    private OffsetDateTime creationTime;
 }

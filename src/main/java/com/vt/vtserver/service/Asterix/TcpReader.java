@@ -20,12 +20,13 @@ public class TcpReader implements Runnable {
     private int port;
     private BlockingQueue<byte[]> rawQueue;
     private TcpManager tcpManager;
+
     TcpReader(BlockingQueue<byte[]> rawQueue, TcpManager tcpManager) {
         this.rawQueue = rawQueue;
         this.tcpManager = tcpManager;
     }
 
-    public void setTcpSettings(){
+    public void setTcpSettings() {
         this.port = tcpManager.getPort();
         this.ip = tcpManager.getIp();
     }
@@ -34,7 +35,7 @@ public class TcpReader implements Runnable {
     public void run() {
         ParseTcpData();
     }
-    
+
     private void ParseTcpData() {
 
         this.setTcpSettings();
@@ -49,26 +50,31 @@ public class TcpReader implements Runnable {
         try {
             createSocketListener(listenerId);
         } catch (Exception e) {
-            log.error("Error in " + listenerId,e);
+            log.error("Error in " + listenerId, e);
         }
     }
-    
+
     private void createSocketListener(String listenerId) throws IOException, InterruptedException {
         final int MAX_PACKET_SIZE = 65507;
         final int TIMEOUT = 30000;
         log.info(listenerId + ": Starting TcpReader on " + ip + ":" + port);
-        
+
         Socket clientSocket = new Socket(ip, port);
 
         clientSocket.setSoTimeout(TIMEOUT);
         byte[] buffer = new byte[MAX_PACKET_SIZE];
         DataInputStream dataInputStream = new DataInputStream(clientSocket.getInputStream());
-        while (true){
-            int bytesRead = dataInputStream.read(buffer);
-            if (bytesRead>0) {
-                byte[] rawBytes = new byte[bytesRead];
-                System.arraycopy(buffer,0,rawBytes,0,bytesRead);
-                rawQueue.put(rawBytes);
+        while (true) {
+            try {
+                int bytesRead = dataInputStream.read(buffer);
+                if (bytesRead > 0) {
+                    byte[] rawBytes = new byte[bytesRead];
+                    System.arraycopy(buffer, 0, rawBytes, 0, bytesRead);
+                    rawQueue.put(rawBytes);
+                }
+            }catch (IOException e){
+                log.error("Connection with radar is interrupted", e);
+                Thread.sleep(1,0);
             }
         }
 

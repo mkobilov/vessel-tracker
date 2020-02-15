@@ -20,6 +20,7 @@ import java.util.concurrent.BlockingQueue;
 @Component
 @Slf4j
 public class RadarDatagramConverter implements Runnable{
+
     private final BlockingQueue<byte[]> rawQueue;
     private boolean isLogEnabled = false;
     private int numberOfQueueItems;

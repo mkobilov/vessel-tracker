@@ -8,6 +8,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 import java.util.List;
 
 @Slf4j
@@ -24,6 +26,8 @@ public class AlarmService {
             alarm.setCollisionTime(dto.getCollisionTime());
             alarm.setCollisionObjectId(dto.getCollisionObjectId());
             alarm.setVesselTrackNumber(dto.getVesselTrackNumber());
+
+            alarm.setCreationTime(OffsetDateTime.now(ZoneOffset.UTC));
 
             alarmRepository.save(alarm);
 

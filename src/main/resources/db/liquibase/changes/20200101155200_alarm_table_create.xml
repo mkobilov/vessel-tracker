@@ -7,12 +7,17 @@
     <changeSet id="20200101155200" author="kobilovm">
         <createTable tableName="alarm">
             <column name="id" type="bigint">
-                <constraints primaryKey="true" nullable="false"/>
+                <constraints nullable="false"/>
             </column>
             <column name = "vessel_id" type="bigint"/>
             <column name = "collision_object_id" type="bigint"/>
             <column name = "seconds_until_collision" type="double precision"/>
             <column name = "minimal_range" type="double precision"/>
+            <column name = "creation_time" type="timestamp"/>
         </createTable>
+        <addPrimaryKey
+                columnNames="id, creation_time"
+                tableName="alarm"
+        />
     </changeSet>
 </databaseChangeLog>
