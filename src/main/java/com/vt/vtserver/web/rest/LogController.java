@@ -1,5 +1,9 @@
 package com.vt.vtserver.web.rest;
 
+import com.vt.vtserver.service.LogService;
+import io.micrometer.core.instrument.Gauge;
+import io.micrometer.core.instrument.MeterRegistry;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.listener.SimpleMessageListenerContainer;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,11 +16,14 @@ import java.util.stream.Collectors;
 
 @RestController
 @Slf4j
+@RequiredArgsConstructor
 @RequestMapping("/log")
 public class LogController{
 
     @Autowired
-    SimpleMessageListenerContainer container;
+    MeterRegistry meterRegistry;
+
+    private final LogService logService;
 
     @GetMapping("/error")
     public String getError(){
@@ -37,11 +44,7 @@ public class LogController{
     }
 
     @GetMapping("/container")
-    public void setConsumers(@RequestParam int n){
-        ArrayList<Thread> threads = new ArrayList<>(Thread.getAllStackTraces().keySet());
-        //todo to gauge
-        log.info(threads.stream().filter(it -> it.getName().startsWith("container")).
-                filter(it -> it.getState() == Thread.State.RUNNABLE).
-                collect(Collectors.toList()).toString());
+    public void getThreads() throws InterruptedException {
+        logService.getThreads();
     }
 }

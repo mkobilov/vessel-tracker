@@ -3,6 +3,7 @@ package com.vt.vtserver.service.Asterix;
 import com.vt.vtserver.web.rest.dto.TargetDTO;
 import io.micrometer.core.instrument.Gauge;
 import io.micrometer.core.instrument.MeterRegistry;
+import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
 import jlg.jade.asterix.AsterixDataBlock;
 import jlg.jade.asterix.AsterixDecoder;
 import jlg.jade.asterix.AsterixRecord;
@@ -10,9 +11,9 @@ import jlg.jade.asterix.cat062.Cat062Record;
 import jlg.jade.asterix.counters.DefaultDecodingReport;
 import lombok.extern.slf4j.Slf4j;
 import org.opengis.referencing.FactoryException;
-import org.springframework.amqp.rabbit.listener.SimpleMessageListenerContainer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
@@ -20,22 +21,14 @@ import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.BlockingQueue;
+import java.util.stream.Collectors;
 
 @Component
 @Slf4j
-public class RadarDatagramConverter implements Runnable{
-
-    @Autowired
-    MeterRegistry registry;
-    @Autowired
-    SimpleMessageListenerContainer container;
-
+public class RadarDatagramConverter implements Runnable {
 
     private final BlockingQueue<byte[]> rawQueue;
     private boolean isLogEnabled = false;
-    private int numberOfQueueItems;
-    private int numberOfReceivedBytes;
-    private int numberOfReceivedBytesFinalFrame;
     //Category of ASTERIX
     private String allowedCategories = "62";
     private final RadarDataWriter radarDataWriter;
@@ -63,17 +56,9 @@ public class RadarDatagramConverter implements Runnable{
             categoriesToDecode.add(62);
         }
 
-
         AsterixDecoder asterixDecoder = new AsterixDecoder(categoriesToDecode);
-
-        long startTime = System.currentTimeMillis();
-        int index = 0;
-
-
-
-
-        //todo clean
         while (true) {
+
             try {
                 byte[] rawData = rawQueue.take();
                 try {
@@ -82,15 +67,12 @@ public class RadarDatagramConverter implements Runnable{
                             0,
                             rawData.length
                     );
-                    numberOfQueueItems++;
-                    numberOfReceivedBytes += rawData.length;
-                    numberOfReceivedBytesFinalFrame += rawData.length + 12;
                     if (isLogEnabled) {
                         for (AsterixDataBlock adb : dataBlocks) {
                             List<AsterixRecord> asterixRecordList = adb.getRecords();
-                            for (AsterixRecord asterixRecord:asterixRecordList){
+                            for (AsterixRecord asterixRecord : asterixRecordList) {
                                 Cat062Record record = asterixRecord.getCat062Record();
-                                OffsetDateTime now = OffsetDateTime.now( ZoneOffset.UTC );
+                                OffsetDateTime now = OffsetDateTime.now(ZoneOffset.UTC);
                                 OffsetDateTime dt = OffsetDateTime.of(LocalDateTime.of(now.getYear(),
                                         now.getMonth(), now.getDayOfMonth(), record.getItem070().getHours(),
                                         record.getItem070().getMinutes(), record.getItem070().getSeconds()),
@@ -99,23 +81,22 @@ public class RadarDatagramConverter implements Runnable{
 
                             asterixDecodingReport.update(adb);
                         }
-                        index++;
 
                     }
 
                     // Write radar targets to database
                     for (AsterixDataBlock adb : dataBlocks) {
                         List<AsterixRecord> asterixRecordList = adb.getRecords();
-                        for (AsterixRecord asterixRecord:asterixRecordList){
+                        for (AsterixRecord asterixRecord : asterixRecordList) {
                             Cat062Record record = asterixRecord.getCat062Record();
-                            OffsetDateTime now = OffsetDateTime.now( ZoneOffset.UTC );
+                            OffsetDateTime now = OffsetDateTime.now(ZoneOffset.UTC);
                             OffsetDateTime dt = OffsetDateTime.of(LocalDateTime.of(now.getYear(),
                                     now.getMonth(), now.getDayOfMonth(), record.getItem070().getHours(),
                                     record.getItem070().getMinutes(), record.getItem070().getSeconds()),
                                     ZoneOffset.UTC);
 
-                            double latImpl = ((double)record.getItem105().getLatitudeWsg84()) * ASTERIX_LATITUDE_RATIO;
-                            double lonImpl = ((double)record.getItem105().getLongitudeWsg84()) * ASTERIX_LATITUDE_RATIO;
+                            double latImpl = ((double) record.getItem105().getLatitudeWsg84()) * ASTERIX_LATITUDE_RATIO;
+                            double lonImpl = ((double) record.getItem105().getLongitudeWsg84()) * ASTERIX_LATITUDE_RATIO;
 
                             TargetDTO dto = new TargetDTO(
                                     record.getItem010().getSac(),

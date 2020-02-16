@@ -6,6 +6,7 @@ import com.vt.vtserver.service.AlarmService;
 import com.vt.vtserver.service.StationaryObjectService;
 import com.vt.vtserver.service.TargetService;
 import com.vt.vtserver.web.rest.dto.AlarmDTO;
+import io.micrometer.core.annotation.Timed;
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Timer;
 import lombok.AllArgsConstructor;
@@ -22,9 +23,9 @@ import java.util.List;
 @Slf4j
 public class GeoUtils {
     @Autowired
-    private MeterRegistry registry;
-    @Autowired
-    private Timer timer;
+    private MeterRegistry meterRegistry;
+//    @Autowired
+//    private Timer timer;
 
     //private final StationaryObjectRepository stationaryObjectRepository;
     private final TargetService targetService;
@@ -41,10 +42,9 @@ public class GeoUtils {
         public double tmin;
         public boolean collision_detected;
     }
-
+    @Timed
     public void CheckOnCollision(MessageUnit messageUnit) {
-        Timer.Sample sample = Timer.start(registry);
-
+//        Timer.Sample sample = Timer.start(registry);
         List<StationaryObject> stationaryObjectList = stationaryObjectService.getAllStationaryObjects();
         for (StationaryObject object : stationaryObjectList) {
             AlarmInfoUnit alarmInfoUnit = CheckOnCollisionWithObject(messageUnit, object);
@@ -68,7 +68,7 @@ public class GeoUtils {
             }
         }
 
-        sample.stop(timer);
+//        sample.stop(timer);
     }
 
     private AlarmInfoUnit CheckOnCollisionWithObject(MessageUnit messageUnit, StationaryObject stationaryObject) {

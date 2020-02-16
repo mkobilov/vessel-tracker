@@ -5,9 +5,11 @@ import com.vt.vtserver.repository.TargetRepository;
 import com.vt.vtserver.service.Asterix.AsterixListener;
 import com.vt.vtserver.service.Asterix.RadarDataWriter;
 import com.vt.vtserver.service.Asterix.TcpManager;
+import io.micrometer.core.instrument.MeterRegistry;
 import lombok.RequiredArgsConstructor;
 import org.opengis.referencing.FactoryException;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Service;
 

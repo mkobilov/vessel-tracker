@@ -19,6 +19,10 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
+
 @Configuration
 @EnableAutoConfiguration
 @ComponentScan
@@ -61,10 +65,6 @@ public class RabbitMQConfiguration {
         container.setQueueNames(applicationProperties.getQueue());
         container.setMessageListener(listenerAdapter);
         container.setConcurrentConsumers(100);
-        /*System.out.print("container: " + container.getActiveConsumerCount() + "\n");*/
-        Gauge gauge = Gauge.builder("container_gauge", container
-                , SimpleMessageListenerContainer::getActiveConsumerCount).register(registry);
-
 
         return container;
     }
