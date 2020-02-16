@@ -89,5 +89,9 @@ public class TargetService {
 
     }
 
+    public List<Target> getLatestTargets() {
+        return targetRepository.getLatestTargetPositions(1);
+    }
+
 
 }

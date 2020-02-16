@@ -13,7 +13,7 @@
             <column name = "collision_object_id" type="bigint"/>
             <column name = "seconds_until_collision" type="double precision"/>
             <column name = "minimal_range" type="double precision"/>
-            <column name = "creation_time" type="timestamp"/>
+            <column name = "creation_time" type="timestamp with timezone"/>
         </createTable>
         <addPrimaryKey
                 columnNames="id, creation_time"

@@ -21,11 +21,11 @@ public class AutoTimingConfiguration {
     public TimedAspect timedAspect(MeterRegistry registry) {
         return new TimedAspect(registry);
     }
+
     @Bean
     Timer timer(MeterRegistry registry) {
         return Timer.builder("collision.timer")
                 .register(registry);
     }
-
 
 }

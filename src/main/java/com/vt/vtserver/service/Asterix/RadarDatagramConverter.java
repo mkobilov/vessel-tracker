@@ -1,6 +1,8 @@
 package com.vt.vtserver.service.Asterix;
 
 import com.vt.vtserver.web.rest.dto.TargetDTO;
+import io.micrometer.core.instrument.Gauge;
+import io.micrometer.core.instrument.MeterRegistry;
 import jlg.jade.asterix.AsterixDataBlock;
 import jlg.jade.asterix.AsterixDecoder;
 import jlg.jade.asterix.AsterixRecord;
@@ -8,6 +10,8 @@ import jlg.jade.asterix.cat062.Cat062Record;
 import jlg.jade.asterix.counters.DefaultDecodingReport;
 import lombok.extern.slf4j.Slf4j;
 import org.opengis.referencing.FactoryException;
+import org.springframework.amqp.rabbit.listener.SimpleMessageListenerContainer;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
@@ -20,6 +24,12 @@ import java.util.concurrent.BlockingQueue;
 @Component
 @Slf4j
 public class RadarDatagramConverter implements Runnable{
+
+    @Autowired
+    MeterRegistry registry;
+    @Autowired
+    SimpleMessageListenerContainer container;
+
 
     private final BlockingQueue<byte[]> rawQueue;
     private boolean isLogEnabled = false;
@@ -58,6 +68,10 @@ public class RadarDatagramConverter implements Runnable{
 
         long startTime = System.currentTimeMillis();
         int index = 0;
+
+
+
+
         //todo clean
         while (true) {
             try {

@@ -1,10 +1,9 @@
 package com.vt.vtserver.config;
 
-import com.vt.vtserver.repository.AlarmRepository;
-import com.vt.vtserver.repository.StationaryObjectRepository;
 import com.vt.vtserver.service.Messaging.GeoUtils;
 import com.vt.vtserver.service.Messaging.Receiver;
-import lombok.extern.slf4j.Slf4j;
+import io.micrometer.core.instrument.Gauge;
+import io.micrometer.core.instrument.MeterRegistry;
 import org.springframework.amqp.core.Binding;
 import org.springframework.amqp.core.BindingBuilder;
 import org.springframework.amqp.core.Queue;
@@ -19,19 +18,22 @@ import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.data.jpa.repository.JpaRepository;
 
 @Configuration
 @EnableAutoConfiguration
 @ComponentScan
 @EnableRabbit
 public class RabbitMQConfiguration {
+
     @Autowired
     ApplicationProperties applicationProperties;
     @Autowired
     RabbitTemplate rabbitTemplate;
     @Autowired
     GeoUtils geoUtils;
+
+    @Autowired
+    MeterRegistry registry;
 
     public RabbitMQConfiguration() {
     }
@@ -58,7 +60,12 @@ public class RabbitMQConfiguration {
         container.setConnectionFactory(connectionFactory);
         container.setQueueNames(applicationProperties.getQueue());
         container.setMessageListener(listenerAdapter);
-        container.setConcurrentConsumers(10);
+        container.setConcurrentConsumers(100);
+        /*System.out.print("container: " + container.getActiveConsumerCount() + "\n");*/
+        Gauge gauge = Gauge.builder("container_gauge", container
+                , SimpleMessageListenerContainer::getActiveConsumerCount).register(registry);
+
+
         return container;
     }
 

@@ -1,10 +1,11 @@
 package com.vt.vtserver.service.Messaging;
 
 import com.vt.vtserver.model.StationaryObject;
+import com.vt.vtserver.model.Target;
 import com.vt.vtserver.service.AlarmService;
 import com.vt.vtserver.service.StationaryObjectService;
+import com.vt.vtserver.service.TargetService;
 import com.vt.vtserver.web.rest.dto.AlarmDTO;
-import io.micrometer.core.annotation.Timed;
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Timer;
 import lombok.AllArgsConstructor;
@@ -26,10 +27,12 @@ public class GeoUtils {
     private Timer timer;
 
     //private final StationaryObjectRepository stationaryObjectRepository;
+    private final TargetService targetService;
     private final StationaryObjectService stationaryObjectService;
     private final AlarmService alarmService;
-    //Todo change
-    private final double MINIMUM_RANGE = 30;
+    //Todo change value if required
+    private final double minimumStationaryObjectRange = 30;
+    private final double minimumTargetObjectRange = 10;
 
 
     @AllArgsConstructor
@@ -39,9 +42,8 @@ public class GeoUtils {
         public boolean collision_detected;
     }
 
-
     public void CheckOnCollision(MessageUnit messageUnit) {
-        //Timer.Sample sample = Timer.start(registry);
+        Timer.Sample sample = Timer.start(registry);
 
         List<StationaryObject> stationaryObjectList = stationaryObjectService.getAllStationaryObjects();
         for (StationaryObject object : stationaryObjectList) {
@@ -51,13 +53,22 @@ public class GeoUtils {
 
                 AlarmDTO dto = new AlarmDTO(messageUnit.id, object.getId(),
                         collisionTime, alarmInfoUnit.rmin);
-                //alarmService.deletePreviousAlarm(dto);
                 alarmService.postAlarm(dto);
-                return;
+            }
+        }
+        List<Target> targetList = targetService.getLatestTargets();
+        for (Target target : targetList) {
+            AlarmInfoUnit alarmInfoUnit = CheckOnCollisionWithVessel(messageUnit, target);
+            if (alarmInfoUnit.collision_detected) {
+                Timestamp collisionTime = new Timestamp(System.currentTimeMillis() + (long) (1000 * alarmInfoUnit.tmin));
+
+                AlarmDTO dto = new AlarmDTO(messageUnit.id, target.getTrackNumber(),
+                        collisionTime, alarmInfoUnit.rmin);
+                alarmService.postAlarm(dto);
             }
         }
 
-        //sample.stop(timer);
+        sample.stop(timer);
     }
 
     private AlarmInfoUnit CheckOnCollisionWithObject(MessageUnit messageUnit, StationaryObject stationaryObject) {
@@ -72,8 +83,33 @@ public class GeoUtils {
         // when distance between vessel and stationary object hits its minimum value
         double tmin = -(vx * (x0 - x1) + vy * (y0 - y1)) / (vx * vx + vy * vy);
         double rmin = Math.sqrt(Math.scalb((x0 - x1 + vx * tmin), 2) +
-                Math.scalb((y0 - y1 + vx * tmin), 2));
+                Math.scalb((y0 - y1 + vy * tmin), 2));
 
-        return new AlarmInfoUnit(rmin, tmin, (rmin <= MINIMUM_RANGE) && tmin > 0);
+        return new AlarmInfoUnit(rmin, tmin, (rmin <= minimumStationaryObjectRange) && tmin > 0);
+    }
+
+    private AlarmInfoUnit CheckOnCollisionWithVessel(MessageUnit messageUnit, Target target) {
+        //todo collision with vessel
+        double x10 = messageUnit.x;
+        double y10 = messageUnit.y;
+        double v1x = messageUnit.vx;
+        double v1y = messageUnit.vy;
+
+        double x20 = target.getX();
+        double y20 = target.getY();
+        double v2x = target.getVx();
+        double v2y = target.getVy();
+
+        double dx = (x10 - x20);
+        double dy = (y10 - y20);
+        double dvx = (v1x - v2x);
+        double dvy = (v1y - v2y);
+
+
+        double tmin = -(dx * dvx + dy * dvy) / (dvy * dvy + dvx * dvx);
+        double rmin = Math.sqrt(Math.scalb((dx + dvx * tmin), 2) +
+                Math.scalb((dy + dvx * tmin), 2));
+
+        return new AlarmInfoUnit(rmin, tmin, (rmin <= minimumTargetObjectRange) && tmin > 0);
     }
 }
