@@ -22,6 +22,7 @@
     <include file="db/liquibase/changes/20200206194800_alarm_table_column_vessel_id_name_change_to_vessel_track_number.xml"/>
     <include file="db/liquibase/changes/20200206205200_alarm_table_column_tmin_name_change_to_collsion_time.xml"/>
     <include file="db/liquibase/changes/20200206205700_alarm_table_column_collision_time_type_change_to_time.xml"/>
+    <include file="db/liquibase/changes/20200215095800_create_hypertable_alarm.xml"/>
 
 
 </databaseChangeLog>
