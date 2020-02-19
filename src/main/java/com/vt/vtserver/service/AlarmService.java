@@ -6,15 +6,17 @@ import com.vt.vtserver.web.rest.dto.AlarmDTO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import javax.annotation.PostConstruct;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Slf4j
 @RequiredArgsConstructor
 @Service
+@Transactional
 public class AlarmService {
     private final AlarmRepository alarmRepository;
 
@@ -38,14 +40,18 @@ public class AlarmService {
         }
     }
 
-    public void deletePreviousAlarm(AlarmDTO dto) {
+    public void postAlarms(List<AlarmDTO> alarmDTOS) {
+        List<Alarm> alarms = alarmDTOS.stream()
+                .map(dto -> new Alarm(dto))
+                .collect(Collectors.toList());
 
-        List<Alarm> list = alarmRepository.deleteByVesselTrackNumberAndCollisionObjectId(dto.getVesselTrackNumber(),
-                dto.getCollisionObjectId());
+        alarmRepository.saveAll(alarms);
     }
 
-    @PostConstruct
-    public void deleteAllAlarms(){
-        alarmRepository.deleteAll();
+    public void deletePreviousAlarm(Long vesselTrackNumber, Long stationaryObjectId) {
+
+        alarmRepository.deleteByVesselTrackNumberAndCollisionObjectId(vesselTrackNumber, stationaryObjectId);
     }
+
+
 }

@@ -1,10 +1,11 @@
 package com.vt.vtserver.repository;
 
 import com.vt.vtserver.model.Alarm;
+import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import java.util.List;
-
+@EntityScan(basePackages = {"com.vt.vtserver.model"})
 public interface AlarmRepository extends JpaRepository<Alarm, Long> {
-    List<Alarm> deleteByVesselTrackNumberAndCollisionObjectId(Long vesselTrackNumber, Long stationaryObjectId);
+
+    void deleteByVesselTrackNumberAndCollisionObjectId(Long targteId, Long objectId);
 }

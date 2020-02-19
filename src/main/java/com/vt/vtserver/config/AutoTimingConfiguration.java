@@ -33,6 +33,11 @@ public class AutoTimingConfiguration {
         return Timer.builder("collision.timer")
                 .register(registry);
     }
+//    @Bean
+//    Timer timerDB(MeterRegistry registry) {
+//        return Timer.builder("db.query.timer")
+//                .register(registry);
+//    }
 
     @Bean
     public TimedAspect timedAspect(MeterRegistry registry) {

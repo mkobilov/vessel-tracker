@@ -5,8 +5,10 @@ import io.micrometer.core.instrument.Gauge;
 import io.micrometer.core.instrument.MeterRegistry;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.geotools.xml.xsi.XSISimpleTypes;
 import org.springframework.amqp.rabbit.listener.SimpleMessageListenerContainer;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
@@ -44,7 +46,9 @@ public class LogController{
     }
 
     @GetMapping("/container")
-    public void getThreads() throws InterruptedException {
+    public ResponseEntity<String> getThreads() throws InterruptedException {
+        String s = new String("ok");
         logService.getThreads();
+        return ResponseEntity.ok(s);
     }
 }

@@ -6,7 +6,6 @@ import com.vt.vtserver.service.AlarmService;
 import com.vt.vtserver.service.StationaryObjectService;
 import com.vt.vtserver.service.TargetService;
 import com.vt.vtserver.web.rest.dto.AlarmDTO;
-import io.micrometer.core.annotation.Timed;
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Timer;
 import lombok.AllArgsConstructor;
@@ -16,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -24,8 +24,10 @@ import java.util.List;
 public class GeoUtils {
     @Autowired
     private MeterRegistry meterRegistry;
+    @Autowired
+    private Timer timer;
 //    @Autowired
-//    private Timer timer;
+//    private Timer timerDB;
 
     //private final StationaryObjectRepository stationaryObjectRepository;
     private final TargetService targetService;
@@ -34,6 +36,7 @@ public class GeoUtils {
     //Todo change value if required
     private final double minimumStationaryObjectRange = 30;
     private final double minimumTargetObjectRange = 10;
+    private final double maximumCollisionTime = 1800;
 
 
     @AllArgsConstructor
@@ -42,10 +45,12 @@ public class GeoUtils {
         public double tmin;
         public boolean collision_detected;
     }
-    @Timed
-    public void CheckOnCollision(MessageUnit messageUnit) {
-//        Timer.Sample sample = Timer.start(registry);
+
+    public void CheckOnCollision(MessageUnit messageUnit) throws InterruptedException {
+        Timer.Sample sample = Timer.start(meterRegistry);
         List<StationaryObject> stationaryObjectList = stationaryObjectService.getAllStationaryObjects();
+        List<Target> targetList = targetService.getLatestTargets();
+        List<AlarmDTO> alarms = new ArrayList<>();
         for (StationaryObject object : stationaryObjectList) {
             AlarmInfoUnit alarmInfoUnit = CheckOnCollisionWithObject(messageUnit, object);
             if (alarmInfoUnit.collision_detected) {
@@ -53,10 +58,12 @@ public class GeoUtils {
 
                 AlarmDTO dto = new AlarmDTO(messageUnit.id, object.getId(),
                         collisionTime, alarmInfoUnit.rmin);
-                alarmService.postAlarm(dto);
+                alarms.add(dto);
+
             }
         }
-        List<Target> targetList = targetService.getLatestTargets();
+
+
         for (Target target : targetList) {
             AlarmInfoUnit alarmInfoUnit = CheckOnCollisionWithVessel(messageUnit, target);
             if (alarmInfoUnit.collision_detected) {
@@ -64,14 +71,17 @@ public class GeoUtils {
 
                 AlarmDTO dto = new AlarmDTO(messageUnit.id, target.getTrackNumber(),
                         collisionTime, alarmInfoUnit.rmin);
-                alarmService.postAlarm(dto);
+                alarms.add(dto);
             }
         }
-
-//        sample.stop(timer);
+        sample.stop(timer);
+        alarmService.postAlarms(alarms);
+//        Thread.sleep(120000,0);
     }
 
     private AlarmInfoUnit CheckOnCollisionWithObject(MessageUnit messageUnit, StationaryObject stationaryObject) {
+
+
         double x0 = messageUnit.x;
         double y0 = messageUnit.y;
         double vx = messageUnit.vx;
@@ -85,20 +95,27 @@ public class GeoUtils {
         double rmin = Math.sqrt(Math.scalb((x0 - x1 + vx * tmin), 2) +
                 Math.scalb((y0 - y1 + vy * tmin), 2));
 
-        return new AlarmInfoUnit(rmin, tmin, (rmin <= minimumStationaryObjectRange) && tmin > 0);
+        return new AlarmInfoUnit(rmin, tmin, (rmin <= minimumStationaryObjectRange) &&
+                tmin > 0 &&
+                tmin < 1800);
     }
 
     private AlarmInfoUnit CheckOnCollisionWithVessel(MessageUnit messageUnit, Target target) {
-        //todo collision with vessel
+
+        if (target == null) {
+            return new AlarmInfoUnit(0, 0, false);
+        }
+
+
         double x10 = messageUnit.x;
         double y10 = messageUnit.y;
         double v1x = messageUnit.vx;
         double v1y = messageUnit.vy;
-
         double x20 = target.getX();
         double y20 = target.getY();
         double v2x = target.getVx();
         double v2y = target.getVy();
+
 
         double dx = (x10 - x20);
         double dy = (y10 - y20);
@@ -110,6 +127,8 @@ public class GeoUtils {
         double rmin = Math.sqrt(Math.scalb((dx + dvx * tmin), 2) +
                 Math.scalb((dy + dvx * tmin), 2));
 
-        return new AlarmInfoUnit(rmin, tmin, (rmin <= minimumTargetObjectRange) && tmin > 0);
+        return new AlarmInfoUnit(rmin, tmin, (rmin <= minimumTargetObjectRange)
+                && tmin > 0
+                && tmin < 1800);
     }
 }

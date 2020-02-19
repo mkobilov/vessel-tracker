@@ -32,10 +32,6 @@ public class AsterixListener {
                 throw new RuntimeException("Invalid mode. First parameter must be tcp, udp or file.");
             }
             switch (mode){
-                case "udp":{
-                    //ParseUdpUnicastData(rawQueue,args);
-                    break;
-                }
                 case "tcp":{
                     ParseTcpData(rawRadarQueue,
                             this.radarDataWriter, tcpManager);

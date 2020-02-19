@@ -64,7 +64,7 @@ public class RabbitMQConfiguration {
         container.setConnectionFactory(connectionFactory);
         container.setQueueNames(applicationProperties.getQueue());
         container.setMessageListener(listenerAdapter);
-        container.setConcurrentConsumers(100);
+        container.setConcurrentConsumers(7);
 
         return container;
     }

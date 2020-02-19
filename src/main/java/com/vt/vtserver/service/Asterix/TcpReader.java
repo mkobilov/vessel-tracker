@@ -73,8 +73,8 @@ public class TcpReader implements Runnable {
                     rawQueue.put(rawBytes);
                 }
             }catch (IOException e){
-                log.error("Connection with radar is interrupted", e);
-                Thread.sleep(1,0);
+                log.warn("Connection with radar is interrupted", e);
+                Thread.sleep(1000,0);
             }
         }
 

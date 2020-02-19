@@ -1,5 +1,6 @@
 package com.vt.vtserver.model;
 
+import com.vt.vtserver.web.rest.dto.AlarmDTO;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -7,6 +8,7 @@ import lombok.NoArgsConstructor;
 import javax.persistence.*;
 import java.sql.Timestamp;
 import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 
 @Entity
 @Table(name = "alarm")
@@ -14,6 +16,15 @@ import java.time.OffsetDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 public class Alarm {
+
+    public Alarm(AlarmDTO dto){
+        this.setVesselTrackNumber(dto.getVesselTrackNumber());
+        this.setCollisionObjectId(dto.getCollisionObjectId());
+        this.setRmin(dto.getRmin());
+        this.setCollisionTime(dto.getCollisionTime());
+        setCreationTime(OffsetDateTime.now(ZoneOffset.UTC));
+    }
+
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "vessel_sequence")
     @SequenceGenerator(name = "vessel_sequence", sequenceName = "sequence_generator", allocationSize = 1)
