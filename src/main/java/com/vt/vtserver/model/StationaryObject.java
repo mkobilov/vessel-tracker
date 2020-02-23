@@ -11,7 +11,7 @@ public class StationaryObject {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "stationary_object_sequence")
-    @SequenceGenerator(name="stationary_object_sequence", sequenceName = "stationary_object_sequence_generator", allocationSize=1)
+    @SequenceGenerator(name = "stationary_object_sequence", sequenceName = "stationary_object_sequence_generator", allocationSize = 1)
     @Column(name = "id")
     private Long id;
 
@@ -27,8 +27,4 @@ public class StationaryObject {
 
     @Column(columnDefinition = "boolean default false")
     private Boolean deleted = false;
-
-    public StationaryObject(){
-
-    }
 }

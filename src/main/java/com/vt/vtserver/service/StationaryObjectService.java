@@ -2,7 +2,7 @@ package com.vt.vtserver.service;
 
 import com.vt.vtserver.model.StationaryObject;
 import com.vt.vtserver.repository.StationaryObjectRepository;
-import com.vt.vtserver.web.rest.dto.StationaryObjectDTO;
+import com.vt.vtserver.web.rest.dto.StationaryObjectDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.geotools.geometry.jts.JTS;
@@ -28,19 +28,14 @@ public class StationaryObjectService {
 
     private final TargetService targetService;
 
-
     public List<StationaryObject> getAllStationaryObjects() {
-        try {
-            return stationaryObjectRepository.findAll();
-        } catch (Exception e) {
-            log.error("Service Error getVessel :" + e);
-            return null;
-        }
+        return stationaryObjectRepository.findAll();
     }
 
-    public StationaryObject postStationaryObject(StationaryObjectDTO dto) throws FactoryException, TransformException {
+    public StationaryObject postStationaryObject(StationaryObjectDto dto) throws FactoryException, TransformException {
         StationaryObject stationaryObject = new StationaryObject();
-        if(dto.getLat() != null && dto.getLon() != null){
+
+        if (dto.getLat() != null && dto.getLon() != null) {
             CoordinateReferenceSystem sourceCRS = CRS.decode("EPSG:4326");   //code of elliptical reference system
             CoordinateReferenceSystem targetCRS = CRS.decode("EPSG:3857");   //code of Cartesian reference system
             MathTransform mathTransform = CRS.findMathTransform(sourceCRS, targetCRS);
@@ -52,8 +47,8 @@ public class StationaryObjectService {
             stationaryObject.setLat(dto.getLat());
             stationaryObject.setLon(dto.getLon());
 
-            Point sourcePoint  =geometryFactory.createPoint(new Coordinate(dto.getLon(), dto.getLat()));
-            Geometry geometry = JTS.transform(sourcePoint,mathTransform);
+            Point sourcePoint = geometryFactory.createPoint(new Coordinate(dto.getLon(), dto.getLat()));
+            Geometry geometry = JTS.transform(sourcePoint, mathTransform);
             stationaryObject.setX(geometry.getCoordinate().x);
             stationaryObject.setY(geometry.getCoordinate().y);
 
@@ -62,8 +57,7 @@ public class StationaryObjectService {
             targetService.postStationaryObject(stationaryObject, dto.getTrackNumber());
 
             return stationaryObject;
-        }
-        else if(dto.getX() != null && dto.getY() != null){
+        } else if (dto.getX() != null && dto.getY() != null) {
             CoordinateReferenceSystem sourceCRS = CRS.decode("EPSG:3857");   //code of elliptical reference system
             CoordinateReferenceSystem targetCRS = CRS.decode("EPSG:4326");   //code of Cartesian reference system
             MathTransform mathTransform = CRS.findMathTransform(sourceCRS, targetCRS);
@@ -76,16 +70,16 @@ public class StationaryObjectService {
             stationaryObject.setY(dto.getY());
 
             Point sourcePoint = geometryFactory.createPoint(new Coordinate(dto.getX(), dto.getY()));
-            Geometry geometry = JTS.transform(sourcePoint,mathTransform);
+            Geometry geometry = JTS.transform(sourcePoint, mathTransform);
             stationaryObject.setLon(geometry.getCoordinate().y);
             stationaryObject.setLat(geometry.getCoordinate().x);
 
             stationaryObjectRepository.save(stationaryObject);
-            //crutch for a worldmap graphana plugin
+            //crutch for a worldmap grafana plugin
             targetService.postStationaryObject(stationaryObject, dto.getTrackNumber());
+
             return stationaryObject;
-        }
-        else{
+        } else {
             log.warn("Empty dto during postStationaryObject: " + dto);
             return null;
         }

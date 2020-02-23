@@ -1,10 +1,7 @@
 package com.vt.vtserver.service.Messaging;
 
-import io.micrometer.core.instrument.Timer;
 import lombok.RequiredArgsConstructor;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
-
-import java.util.concurrent.TimeUnit;
 
 @RabbitListener
 @RequiredArgsConstructor

@@ -1,5 +1,6 @@
 package com.vt.vtserver.service;
 
+import com.vt.vtserver.service.Asterix.CommonConstants;
 import io.micrometer.core.instrument.Gauge;
 import io.micrometer.core.instrument.MeterRegistry;
 import lombok.extern.slf4j.Slf4j;
@@ -17,22 +18,24 @@ public class LogService {
     @Autowired
     MeterRegistry meterRegistry;
 
+    public boolean scanThreads = false;
+
     @Async
-    public void getThreads() throws InterruptedException {
+    public void scanThreads() throws InterruptedException {
         ArrayList<Thread> threads = new ArrayList<>(Thread.getAllStackTraces().keySet());
-        //todo to gauge
-        List<Thread> threadList = threads.stream().filter(it -> it.getName().startsWith("container")).
+        List<Thread> threadList = threads.stream().
+                filter(it -> it.getName().startsWith(CommonConstants.THREAD_NAME_PATTERN)).
                 filter(it -> it.getState() == Thread.State.RUNNABLE).
                 collect(Collectors.toList());
-        Gauge gauge = Gauge.builder("thread_gauge",threadList, List::size).register(meterRegistry);
-        log.warn("size1 = " + threadList.size());
 
-        while (true) {
+        String threadGaugeName = "thread_gauge";
+        Gauge.builder(threadGaugeName, threadList, List::size).register(meterRegistry);
+        while (scanThreads) {
             threadList.clear();
             threadList.addAll(threads.stream().filter(it -> it.getName().startsWith("container")).
                     filter(it -> it.getState() == Thread.State.RUNNABLE).
                     collect(Collectors.toList()));
-            Thread.sleep(1000,0);
+            Thread.sleep(1000, 0);
         }
     }
 

@@ -1,11 +1,12 @@
 package com.vt.vtserver.service.Messaging;
 
+import com.vt.vtserver.config.ApplicationProperties;
 import com.vt.vtserver.model.StationaryObject;
 import com.vt.vtserver.model.Target;
 import com.vt.vtserver.service.AlarmService;
 import com.vt.vtserver.service.StationaryObjectService;
 import com.vt.vtserver.service.TargetService;
-import com.vt.vtserver.web.rest.dto.AlarmDTO;
+import com.vt.vtserver.web.rest.dto.AlarmDto;
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Timer;
 import lombok.AllArgsConstructor;
@@ -26,6 +27,9 @@ public class GeoUtils {
     private MeterRegistry meterRegistry;
     @Autowired
     private Timer timer;
+    @Autowired
+    private ApplicationProperties applicationProperties;
+
 //    @Autowired
 //    private Timer timerDB;
 
@@ -33,44 +37,42 @@ public class GeoUtils {
     private final TargetService targetService;
     private final StationaryObjectService stationaryObjectService;
     private final AlarmService alarmService;
-    //Todo change value if required
-    private final double minimumStationaryObjectRange = 30;
-    private final double minimumTargetObjectRange = 10;
-    private final double maximumCollisionTime = 1800;
 
 
     @AllArgsConstructor
     private static class AlarmInfoUnit {
-        public double rmin;
-        public double tmin;
-        public boolean collision_detected;
+        public double minimalRange;
+        public double estimatedCollisionTimeSeconds;
+        public boolean collisionDetected;
     }
 
     public void CheckOnCollision(MessageUnit messageUnit) throws InterruptedException {
         Timer.Sample sample = Timer.start(meterRegistry);
         List<StationaryObject> stationaryObjectList = stationaryObjectService.getAllStationaryObjects();
         List<Target> targetList = targetService.getLatestTargets();
-        List<AlarmDTO> alarms = new ArrayList<>();
+
+        List<AlarmDto> alarms = new ArrayList<>();
+
         for (StationaryObject object : stationaryObjectList) {
             AlarmInfoUnit alarmInfoUnit = CheckOnCollisionWithObject(messageUnit, object);
-            if (alarmInfoUnit.collision_detected) {
-                Timestamp collisionTime = new Timestamp(System.currentTimeMillis() + (long) (1000 * alarmInfoUnit.tmin));
 
-                AlarmDTO dto = new AlarmDTO(messageUnit.id, object.getId(),
-                        collisionTime, alarmInfoUnit.rmin);
+            if (alarmInfoUnit.collisionDetected) {
+                Timestamp collisionTime = new Timestamp(System.currentTimeMillis()
+                        + (long) (1000 * alarmInfoUnit.estimatedCollisionTimeSeconds));
+
+                AlarmDto dto = new AlarmDto(messageUnit.getId(), object.getId(), collisionTime, alarmInfoUnit.minimalRange);
                 alarms.add(dto);
-
             }
         }
 
-
         for (Target target : targetList) {
             AlarmInfoUnit alarmInfoUnit = CheckOnCollisionWithVessel(messageUnit, target);
-            if (alarmInfoUnit.collision_detected) {
-                Timestamp collisionTime = new Timestamp(System.currentTimeMillis() + (long) (1000 * alarmInfoUnit.tmin));
+            if (alarmInfoUnit.collisionDetected) {
+                Timestamp collisionTime = new Timestamp(System.currentTimeMillis()
+                        + (long) (1000 * alarmInfoUnit.estimatedCollisionTimeSeconds));
 
-                AlarmDTO dto = new AlarmDTO(messageUnit.id, target.getTrackNumber(),
-                        collisionTime, alarmInfoUnit.rmin);
+                AlarmDto dto = new AlarmDto(messageUnit.getId(), target.getTrackNumber(),
+                        collisionTime, alarmInfoUnit.minimalRange);
                 alarms.add(dto);
             }
         }
@@ -81,23 +83,25 @@ public class GeoUtils {
 
     private AlarmInfoUnit CheckOnCollisionWithObject(MessageUnit messageUnit, StationaryObject stationaryObject) {
 
+        double startX = messageUnit.getX();
+        double startY = messageUnit.getY();
+        double vx = messageUnit.getVx();
+        double vy = messageUnit.getVy();
 
-        double x0 = messageUnit.x;
-        double y0 = messageUnit.y;
-        double vx = messageUnit.vx;
-        double vy = messageUnit.vy;
-
-        double x1 = stationaryObject.getX();
-        double y1 = stationaryObject.getY();
+        double stationaryObjectX = stationaryObject.getX();
+        double stationaryObjectY = stationaryObject.getY();
         //time (in seconds, from the moment of calculation)
         // when distance between vessel and stationary object hits its minimum value
-        double tmin = -(vx * (x0 - x1) + vy * (y0 - y1)) / (vx * vx + vy * vy);
-        double rmin = Math.sqrt(Math.scalb((x0 - x1 + vx * tmin), 2) +
-                Math.scalb((y0 - y1 + vy * tmin), 2));
+        double estimatedCollisionTimeSeconds = -(vx * (startX - stationaryObjectX) + vy * (startY - stationaryObjectY))
+                / (vx * vx + vy * vy);
+        double minimalRange = Math.sqrt(Math.scalb((startX - stationaryObjectX + vx * estimatedCollisionTimeSeconds), 2)
+                + Math.scalb((startY - stationaryObjectY + vy * estimatedCollisionTimeSeconds), 2));
 
-        return new AlarmInfoUnit(rmin, tmin, (rmin <= minimumStationaryObjectRange) &&
-                tmin > 0 &&
-                tmin < 1800);
+        boolean collisionDetected = minimalRange <= applicationProperties.getStationaryObjectMinimalRange()
+                && estimatedCollisionTimeSeconds > 0
+                && estimatedCollisionTimeSeconds < applicationProperties.getMaximumCollisionTimeSeconds();
+
+        return new AlarmInfoUnit(minimalRange, estimatedCollisionTimeSeconds, collisionDetected);
     }
 
     private AlarmInfoUnit CheckOnCollisionWithVessel(MessageUnit messageUnit, Target target) {
@@ -106,29 +110,43 @@ public class GeoUtils {
             return new AlarmInfoUnit(0, 0, false);
         }
 
+        double firstShipStartX = messageUnit.getX();
+        double firstShipStartY = messageUnit.getY();
+        double firstShipVx = messageUnit.getVx();
+        double firstShipVy = messageUnit.getVy();
 
-        double x10 = messageUnit.x;
-        double y10 = messageUnit.y;
-        double v1x = messageUnit.vx;
-        double v1y = messageUnit.vy;
-        double x20 = target.getX();
-        double y20 = target.getY();
-        double v2x = target.getVx();
-        double v2y = target.getVy();
+        double secondShipStartX = target.getX();
+        double secondShipStartY = target.getY();
+        double secondShipVx = target.getVx();
+        double secondShipVy = target.getVy();
+
+        double coordinateDifferenceX = (firstShipStartX - secondShipStartX);
+        double coordinateDifferenceY = (firstShipStartY - secondShipStartY);
+        double speedDifferenceX = (firstShipVx - secondShipVx);
+        double speedDifferenceY = (firstShipVy - secondShipVy);
 
 
-        double dx = (x10 - x20);
-        double dy = (y10 - y20);
-        double dvx = (v1x - v2x);
-        double dvy = (v1y - v2y);
+        double estimatedCollisionTimeSeconds = -(coordinateDifferenceX * speedDifferenceX
+                + coordinateDifferenceY * speedDifferenceY)
+                / (speedDifferenceY * speedDifferenceY + speedDifferenceX * speedDifferenceX);
+        double minimalRange = Math.sqrt(Math.scalb((coordinateDifferenceX +
+                speedDifferenceX * estimatedCollisionTimeSeconds), 2)
+                + Math.scalb((coordinateDifferenceY + speedDifferenceX * estimatedCollisionTimeSeconds), 2));
 
-
-        double tmin = -(dx * dvx + dy * dvy) / (dvy * dvy + dvx * dvx);
-        double rmin = Math.sqrt(Math.scalb((dx + dvx * tmin), 2) +
-                Math.scalb((dy + dvx * tmin), 2));
-
-        return new AlarmInfoUnit(rmin, tmin, (rmin <= minimumTargetObjectRange)
-                && tmin > 0
-                && tmin < 1800);
+        return new AlarmInfoUnit(minimalRange, estimatedCollisionTimeSeconds,
+                (minimalRange <= applicationProperties.getVesselMinimalRange())
+                        && estimatedCollisionTimeSeconds > 0
+                        && estimatedCollisionTimeSeconds < applicationProperties.getMaximumCollisionTimeSeconds());
     }
+
+//    private static class ShipForComparison {
+//        Pair<Integer, Integer> startingPosition;
+//        Pair<Integer, Integer> startingSpeed;
+//    }
+//
+//    private AlarmInfoUnit CheckOnCollisionWithVessel(Pair<ShipForComparison, ShipForComparison> pair) {
+//        ShipForComparison first = pair.getKey();
+//        ShipForComparison second = pair.getValue();
+//        return new AlarmInfoUnit();
+//    }
 }

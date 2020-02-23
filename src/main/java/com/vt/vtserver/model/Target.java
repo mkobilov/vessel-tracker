@@ -1,26 +1,23 @@
 package com.vt.vtserver.model;
 
 
+import com.vt.vtserver.web.rest.dto.TargetDto;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.hibernate.annotations.Type;
-import org.hibernate.annotations.TypeDef;
-import org.hibernate.annotations.TypeDefs;
-
 
 import javax.persistence.*;
-import java.sql.Timestamp;
 import java.time.OffsetDateTime;
 
 @Entity
 @Data
 @Slf4j
+@NoArgsConstructor
 @Table(name = "target")
 public class Target {
-
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "target_sequence")
-    @SequenceGenerator(name="target_sequence", sequenceName = "target_sequence_generator", allocationSize=1)
+    @SequenceGenerator(name = "target_sequence", sequenceName = "target_sequence_generator", allocationSize = 1)
     @Column(name = "id")
     private Long id;
     @Column(name = "track_nb")
@@ -33,21 +30,31 @@ public class Target {
     private Double heading;
     private Double speed;
 
-    private int sac;
-    private int sin;
+    @Column(name = "sac")
+    private int systemAreaCode;
+    @Column(name = "sin")
+    private int systemIdentificationCode;
+
     private OffsetDateTime dateTime;
     private double lat;
     private double lon;
 
-
-    private int cfn;
-    private int fpc;
-    private int mon;
-    private int mrh;
-    private int sim;
-    private int spi;
-    private int src;
-    private int tse;
+    @Column(name = "cfn")
+    private int confirmationType;
+    @Column(name = "fpc")
+    private int correlationType;
+    @Column(name = "mon")
+    private int sensorType;
+    @Column(name = "mrh")
+    private int mostReliableHeight;
+    @Column(name = "sim")
+    private int trackRealityType;
+    @Column(name = "spi")
+    private int specialPositionIdentification;
+    @Column(name = "src")
+    private int sourceOfCalculatedTrackAltitude;
+    @Column(name = "tse")
+    private int transmissionOrder;
 
     //crutch for grafana worldmap plugin
     @Column(name = "stationary_object")
@@ -57,4 +64,25 @@ public class Target {
     private OffsetDateTime creationTime;
     @Column(name = "update_time")
     private OffsetDateTime updateTime;
+
+    public Target(TargetDto dto) {
+        this.setConfirmationType(dto.getConfirmationType());
+        this.setDateTime(dto.getDateTime());
+        this.setCorrelationType(dto.getCorrelationType());
+        this.setHeading(heading);
+        this.setLat(dto.getLat());
+        this.setLon(dto.getLon());
+        this.setSensorType(dto.getSensorType());
+        this.setMostReliableHeight(dto.getMostReliableHeight());
+        this.setSystemAreaCode(dto.getSystemAreaCode());
+        this.setTrackRealityType(dto.getTrackRealityType());
+        this.setSystemIdentificationCode(dto.getSystemIdentificationCode());
+        this.setSpecialPositionIdentification(dto.getSpecialPositionIdentification());
+        this.setSourceOfCalculatedTrackAltitude(dto.getSourceOfCalculatedTrackAltitude());
+        this.setTrackNumber(dto.getTrackNumber());
+        this.setTransmissionOrder(dto.getTransmissionOrder());
+        this.setVx((double) dto.getVx());
+        this.setVy((double) dto.getVy());
+        this.setDateTime(dto.getDateTime());
+    }
 }

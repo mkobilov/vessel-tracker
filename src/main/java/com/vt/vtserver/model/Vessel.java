@@ -1,5 +1,6 @@
 package com.vt.vtserver.model;
 
+import com.vt.vtserver.web.rest.dto.VesselDto;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -16,7 +17,7 @@ public class Vessel {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "vessel_sequence")
-    @SequenceGenerator(name="vessel_sequence", sequenceName = "sequence_generator", allocationSize=1)
+    @SequenceGenerator(name = "vessel_sequence", sequenceName = "sequence_generator", allocationSize = 1)
     @Column(name = "id")
     private Long id;
 
@@ -41,4 +42,13 @@ public class Vessel {
     @Column(columnDefinition = "boolean default false")
     private Boolean deleted = false;
 
+
+    public Vessel(VesselDto dto) {
+        this.setName(dto.getName());
+        this.setDescription(dto.getDescription());
+        this.setHeading(dto.getHeading());
+        this.setSpeed(dto.getSpeed());
+        this.setLat(dto.getLat());
+        this.setLon(dto.getLon());
+    }
 }

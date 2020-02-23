@@ -1,10 +1,7 @@
 package com.vt.vtserver.service.Asterix;
 
-import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import java.io.DataInputStream;
 import java.io.IOException;
@@ -15,20 +12,15 @@ import java.util.concurrent.BlockingQueue;
 @Slf4j
 @Component
 public class TcpReader implements Runnable {
-
-    private String ip;
-    private int port;
     private BlockingQueue<byte[]> rawQueue;
     private TcpManager tcpManager;
+
+    private byte[] buffer;
+    private DataInputStream dataInputStream;
 
     TcpReader(BlockingQueue<byte[]> rawQueue, TcpManager tcpManager) {
         this.rawQueue = rawQueue;
         this.tcpManager = tcpManager;
-    }
-
-    public void setTcpSettings() {
-        this.port = tcpManager.getPort();
-        this.ip = tcpManager.getIp();
     }
 
     @Override
@@ -37,33 +29,30 @@ public class TcpReader implements Runnable {
     }
 
     private void ParseTcpData() {
-
-        this.setTcpSettings();
-
-        final int MAX_PACKET_SIZE = 65507;
-        final int TIMEOUT = 30000;
-
-        System.out.println("Starting TcpReader on " + ip + ":" + port);
-
+        log.info("Starting TcpReader on " + tcpManager.getIp() + ":" + tcpManager.getPort());
 
         String listenerId = "TcpListener" + UUID.randomUUID().toString();
         try {
             createSocketListener(listenerId);
+        } catch (InterruptedException e) {
+            log.error("Socket creation interrupted" + listenerId, e);
+        } catch (IOException e) {
+            log.error("Socket creation is impossible" + listenerId, e);
         } catch (Exception e) {
-            log.error("Error in " + listenerId, e);
+            log.error("Unknown Error in " + listenerId, e);
         }
     }
 
     private void createSocketListener(String listenerId) throws IOException, InterruptedException {
-        final int MAX_PACKET_SIZE = 65507;
-        final int TIMEOUT = 30000;
-        log.info(listenerId + ": Starting TcpReader on " + ip + ":" + port);
 
-        Socket clientSocket = new Socket(ip, port);
+        log.info(listenerId + ": Starting TcpReader on " + tcpManager.getIp() + ":" + tcpManager.getPort());
 
-        clientSocket.setSoTimeout(TIMEOUT);
-        byte[] buffer = new byte[MAX_PACKET_SIZE];
-        DataInputStream dataInputStream = new DataInputStream(clientSocket.getInputStream());
+        Socket clientSocket = new Socket(tcpManager.getIp(), tcpManager.getPort());
+
+        clientSocket.setSoTimeout(CommonConstants.TIMEOUT);
+        buffer = new byte[CommonConstants.MAX_PACKET_SIZE];
+        dataInputStream = new DataInputStream(clientSocket.getInputStream());
+
         while (true) {
             try {
                 int bytesRead = dataInputStream.read(buffer);
@@ -72,11 +61,19 @@ public class TcpReader implements Runnable {
                     System.arraycopy(buffer, 0, rawBytes, 0, bytesRead);
                     rawQueue.put(rawBytes);
                 }
-            }catch (IOException e){
+            } catch (IOException e) {
                 log.warn("Connection with radar is interrupted", e);
-                Thread.sleep(1000,0);
+                retryConnection();
             }
         }
 
+    }
+
+    private void retryConnection() throws IOException {
+        Socket clientSocket = new Socket(tcpManager.getIp(), tcpManager.getPort());
+
+        clientSocket.setSoTimeout(CommonConstants.TIMEOUT);
+        buffer = new byte[CommonConstants.MAX_PACKET_SIZE];
+        dataInputStream = new DataInputStream(clientSocket.getInputStream());
     }
 }

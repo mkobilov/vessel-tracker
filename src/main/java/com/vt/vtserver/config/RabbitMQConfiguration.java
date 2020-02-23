@@ -2,7 +2,6 @@ package com.vt.vtserver.config;
 
 import com.vt.vtserver.service.Messaging.GeoUtils;
 import com.vt.vtserver.service.Messaging.Receiver;
-import io.micrometer.core.instrument.Gauge;
 import io.micrometer.core.instrument.MeterRegistry;
 import org.springframework.amqp.core.Binding;
 import org.springframework.amqp.core.BindingBuilder;
@@ -19,10 +18,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
-
 @Configuration
 @EnableAutoConfiguration
 @ComponentScan
@@ -38,6 +33,8 @@ public class RabbitMQConfiguration {
 
     @Autowired
     MeterRegistry registry;
+
+    public static final String defaultListenerMethod = "receiveMessage";
 
     public RabbitMQConfiguration() {
     }
@@ -64,7 +61,8 @@ public class RabbitMQConfiguration {
         container.setConnectionFactory(connectionFactory);
         container.setQueueNames(applicationProperties.getQueue());
         container.setMessageListener(listenerAdapter);
-        container.setConcurrentConsumers(7);
+
+        container.setConcurrentConsumers(applicationProperties.getConsumersNumber());
 
         return container;
     }
@@ -76,6 +74,7 @@ public class RabbitMQConfiguration {
 
     @Bean
     MessageListenerAdapter listenerAdapter(Receiver receiver) {
-        return new MessageListenerAdapter(receiver, "receiveMessage");
+
+        return new MessageListenerAdapter(receiver, defaultListenerMethod);
     }
 }

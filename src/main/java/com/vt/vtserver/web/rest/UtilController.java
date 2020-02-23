@@ -17,17 +17,15 @@ public class UtilController {
     private final ApplicationProperties applicationProperties;
 
     @GetMapping("/frequency")
-    public Long getFrequency(){
+    public Long getFrequency() {
         return applicationProperties.getFrequency();
     }
 
     @PostMapping("/message")
-    public void sendMessage(@RequestParam Long value){
-        int i = 0;
-
-        for(i = 0; i < 9; i++){
+    public void sendMessage(@RequestParam Long value) {
+        for (int i = 0; i < 9; i++) {
             System.out.println("Sending message..." + i);
-            rabbitTemplate.convertAndSend(applicationProperties.getQueue(), (value+i));
+            rabbitTemplate.convertAndSend(applicationProperties.getQueue(), (value + i));
         }
     }
 }

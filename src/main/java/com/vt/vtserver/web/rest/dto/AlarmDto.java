@@ -7,12 +7,12 @@ import java.sql.Timestamp;
 
 @AllArgsConstructor
 @Data
-public class AlarmDTO {
+public class AlarmDto {
     private Long vesselTrackNumber;
     private Long collisionObjectId;
 
     //Time in seconds until collision
     private Timestamp collisionTime;
     //Minimal range between vessel and collision object
-    private Double rmin;
+    private Double minimalRange;
 }

@@ -5,11 +5,9 @@ import com.vt.vtserver.repository.TargetRepository;
 import com.vt.vtserver.service.Asterix.AsterixListener;
 import com.vt.vtserver.service.Asterix.RadarDataWriter;
 import com.vt.vtserver.service.Asterix.TcpManager;
-import io.micrometer.core.instrument.MeterRegistry;
 import lombok.RequiredArgsConstructor;
 import org.opengis.referencing.FactoryException;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Service;
 
@@ -21,11 +19,13 @@ import java.util.concurrent.BlockingQueue;
 public class BeanSettings {
     private final ApplicationProperties applicationProperties;
     private final TargetRepository radarTargetRepository;
-    private  final RabbitTemplate rabbitTemplate;
+    private final RabbitTemplate rabbitTemplate;
     private final BlockingQueue<byte[]> rawQueueRadar;
-    @Bean
-    RadarDataWriter radarDataWriter() throws FactoryException { return new RadarDataWriter(radarTargetRepository, rabbitTemplate, applicationProperties); }
 
+    @Bean
+    RadarDataWriter radarDataWriter() throws FactoryException {
+        return new RadarDataWriter(radarTargetRepository, rabbitTemplate, applicationProperties);
+    }
 
     @PostConstruct
     private void init() throws FactoryException {
@@ -34,9 +34,8 @@ public class BeanSettings {
         tcpManager.setIp(applicationProperties.getRadarIP());
         tcpManager.setPort(applicationProperties.getRadarPort());
         // Run radar listener
-        AsterixListener asterixRadarListener = new AsterixListener(radarDataWriter());
+        AsterixListener asterixRadarListener = new AsterixListener(
+                new RadarDataWriter(radarTargetRepository, rabbitTemplate, applicationProperties));
         asterixRadarListener.runAsterixListener(rawQueueRadar, tcpManager);
-
-
     }
 }

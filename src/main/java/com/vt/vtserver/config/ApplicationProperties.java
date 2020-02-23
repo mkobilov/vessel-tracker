@@ -5,8 +5,6 @@ import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 
-import java.util.Queue;
-
 @Data
 @Configuration
 @EnableAutoConfiguration
@@ -19,5 +17,11 @@ public class ApplicationProperties {
     //Rabbit config
     private long frequency;
     private String queue;
+    private int consumersNumber;
+    private int vesselMinimalRange;
+    private int stationaryObjectMinimalRange;
+    private int maximumCollisionTimeSeconds;
+    private int categoryToDecode;
+    private int numberOfThreadsForRadarReceive;
 
 }

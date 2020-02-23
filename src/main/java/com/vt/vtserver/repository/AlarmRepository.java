@@ -7,5 +7,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 @EntityScan(basePackages = {"com.vt.vtserver.model"})
 public interface AlarmRepository extends JpaRepository<Alarm, Long> {
 
-    void deleteByVesselTrackNumberAndCollisionObjectId(Long targteId, Long objectId);
+//    void deleteByVesselTrackNumberAndCollisionObjectId(Long targetId, Long objectId);
 }

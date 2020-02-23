@@ -2,7 +2,7 @@ package com.vt.vtserver.web.rest;
 
 import com.vt.vtserver.model.Target;
 import com.vt.vtserver.service.TargetService;
-import com.vt.vtserver.web.rest.dto.TargetDTO;
+import com.vt.vtserver.web.rest.dto.TargetDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -24,15 +24,17 @@ public class TargetController {
         List<Target> list = targetService.getAllTargets();
         if (list != null)
             return ResponseEntity.ok(list);
+
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
     }
 
     @PostMapping
-    public ResponseEntity<Target> postTarget(@RequestBody TargetDTO dto) {
+    public ResponseEntity<Target> postTarget(@RequestBody TargetDto dto) {
         Target target = targetService.postTarget(dto);
 
         if (target != null)
             return ResponseEntity.ok(target);
+
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
     }
 

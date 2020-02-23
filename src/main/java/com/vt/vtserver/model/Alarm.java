@@ -1,6 +1,6 @@
 package com.vt.vtserver.model;
 
-import com.vt.vtserver.web.rest.dto.AlarmDTO;
+import com.vt.vtserver.web.rest.dto.AlarmDto;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -17,10 +17,10 @@ import java.time.ZoneOffset;
 @NoArgsConstructor
 public class Alarm {
 
-    public Alarm(AlarmDTO dto){
+    public Alarm(AlarmDto dto) {
         this.setVesselTrackNumber(dto.getVesselTrackNumber());
         this.setCollisionObjectId(dto.getCollisionObjectId());
-        this.setRmin(dto.getRmin());
+        this.setMinimalRange(dto.getMinimalRange());
         this.setCollisionTime(dto.getCollisionTime());
         setCreationTime(OffsetDateTime.now(ZoneOffset.UTC));
     }
@@ -39,7 +39,7 @@ public class Alarm {
     private Timestamp collisionTime;
     //Minimal range between vessel and collision object
     @Column(name = "minimal_range")
-    private Double rmin;
+    private Double minimalRange;
 
     @Column(name = "creation_time")
     private OffsetDateTime creationTime;
